@@ -1,0 +1,83 @@
+/* TODO: Header */
+
+.main-icon {
+    width: 2rem;
+}
+
+.isimath-icon {
+    color: var(--color-2);
+}
+
+.header__icon-title {
+    font-size: var(--font-icon);
+    color: var(--color-2)
+}
+
+.header__icon {
+    display: flex;
+    padding: 1rem 0 1rem 1rem;
+    align-items: center;
+}
+
+.header {
+    position: fixed;
+    width: 100vw;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: var(--background-1);
+}
+
+.header__icon-svg {
+    margin-right: .6rem;
+}
+
+.header__nav-button {
+    display: flex;
+    gap: .5rem;
+}
+
+.header__nav-dark-icon {
+    margin-right: .5rem;
+}
+
+.ul__nav {
+    display: flex;
+    list-style: none;
+    gap: 1rem;
+}
+
+.ul__nav-item a{
+    text-decoration: none;
+    font-size: 1rem;
+    color: var(--color-2);
+}
+
+.inicio {
+    height: 80vh;
+    background-color: cadetblue;
+}
+
+.aplicacion {
+    height: 80vh;
+    background-color: blue;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.aplicacion h1 {
+    font-size: 3rem;
+    padding: 2rem;
+}
+
+.app {
+    padding: 1rem 2rem 1rem 2rem;
+    border-radius: 1rem;
+    transition: background-color 1s ease;
+}
+
+.app:hover {
+    background-color: chartreuse;
+}

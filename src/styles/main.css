@@ -1,0 +1,20 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-size: 62.5%;
+}
+
+:root {
+    /* ?Tipos de Letras */
+    --font-icon: 1.5rem;
+
+    /* ?Colores */
+    --color-1: cadetblue;
+    --color-2: aqua;
+
+    --background-1: #000033;
+}
