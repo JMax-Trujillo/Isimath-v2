@@ -1,0 +1,33 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-size: 62.5%;
+}
+
+:root {
+    --fondo-1: #555;
+    --fondo-2: #302f39;
+
+    --color-text-1: #e1e1e8;
+    --color-text-2: #dfe7ee;
+
+    --font-title: 1.5rem;
+}
+
+.dark {
+        --fondo-1: #cccbcf;
+    --fondo-2: #f4f2ff;
+
+    --color-text-1: #2e346b;
+    --color-text-2: #2a4b69;
+
+    --font-title: 1.5rem;
+}
+
+.hide {
+    display: none;
+}

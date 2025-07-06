@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ISIMath - Matemáticas Inteligentes</title>
+    
+    <link rel="stylesheet" href="/styles/index.css">
+    <link rel="stylesheet" href="/styles/landing/landing.css">
+</head>
+<body>
+    <!-- Overlay para móvil -->
+    <div class="landing-overlay" id="overlay"></div>
+
+    <!-- Header -->
+    <header class="landing-header">
+        <nav class="landing-nav">
+            <a href="#home" class="landing-logo">
+                <div class="landing-logo-icon">IM</div>
+                ISIMath
+            </a>
+            
+            <ul class="landing-nav-menu">
+                <li><a href="#home" class="landing-nav-link">Home</a></li>
+                <li><a href="#team" class="landing-nav-link">Team</a></li>
+                <li><a href="#how-to-use" class="landing-nav-link">How to Use</a></li>
+                <li><a href="#contact" class="landing-nav-link">Contact</a></li>
+            </ul>
+
+            <div class="landing-auth-buttons">
+                <button class="landing-dark-toggle" id="darkToggle">🌙</button>
+                <a href="#" class="landing-btn landing-btn-secondary">Sign In</a>
+                <a href="#" class="landing-btn landing-btn-primary">Register</a>
+            </div>
+
+            <button class="landing-mobile-menu-btn" id="mobileMenuBtn">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="3" y1="6" x2="21" y2="6"></line>
+                    <line x1="3" y1="12" x2="21" y2="12"></line>
+                    <line x1="3" y1="18" x2="21" y2="18"></line>
+                </svg>
+            </button>
+        </nav>
+    </header>
+
+    <!-- Sidebar móvil -->
+    <div class="landing-mobile-sidebar" id="mobileSidebar">
+        <button class="landing-mobile-close" id="mobileCloseBtn">×</button>
+        
+        <nav class="landing-mobile-nav">
+            <div class="landing-mobile-nav-item">
+                <a href="#home" class="landing-mobile-nav-link">Home</a>
+            </div>
+            <div class="landing-mobile-nav-item">
+                <a href="#team" class="landing-mobile-nav-link">Team</a>
+            </div>
+            <div class="landing-mobile-nav-item">
+                <a href="#how-to-use" class="landing-mobile-nav-link">How to Use</a>
+            </div>
+            <div class="landing-mobile-nav-item">
+                <a href="#contact" class="landing-mobile-nav-link">Contact</a>
+            </div>
+        </nav>
+
+        <div class="landing-mobile-auth">
+            <button class="landing-dark-toggle" id="darkToggleMobile">🌙</button>
+            <a href="#" class="landing-btn landing-btn-secondary">Sign In</a>
+            <a href="#" class="landing-btn landing-btn-primary">Register</a>
+        </div>
+    </div>
+
+    <!-- Hero Section -->
+    <section id="home" class="landing-hero">
+        <div class="landing-container">
+            <div class="landing-hero-content">
+                <h1 class="landing-hero-title">Bienvenido a ISIMath</h1>
+                <p class="landing-hero-subtitle">
+                    La plataforma de matemáticas más inteligente y avanzada. 
+                    Aprende, practica y domina las matemáticas con nuestra tecnología innovadora.
+                </p>
+                <div class="landing-hero-buttons">
+                    <a href="public/app.html" class="landing-btn landing-btn-primary landing-hero-btn">
+                        Ir a la Aplicación
+                    </a>
+                    <a href="#how-to-use" class="landing-btn landing-btn-secondary landing-hero-btn">
+                        Cómo Usar
+                    </a>
+                </div>
+                <div class="landing-hero-image">
+                    <!-- Espacio reservado para imagen PNG -->
+                    <div style="background: rgba(255,255,255,0.1); border: 2px dashed rgba(255,255,255,0.3); padding: 60px; border-radius: 10px; color: rgba(255,255,255,0.7);">
+                        [Espacio para imagen PNG de ISIMath]
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Team Section -->
+    <section id="team" class="landing-section">
+        <div class="landing-container">
+            <h2 class="landing-section-title">Nuestro Equipo</h2>
+            <div class="landing-section-content">
+                <h3 style="color: #4ecdc4; margin-bottom: 1rem;">Jean Max Trujillo Buendía</h3>
+                <p>Fundador y desarrollador principal de ISIMath. Apasionado por la tecnología educativa y las matemáticas, Jean Max ha creado esta plataforma para revolucionar la forma en que aprendemos matemáticas.</p>
+                <br>
+                <p>Con experiencia en desarrollo de software y educación, nuestro equipo está comprometido con brindar la mejor experiencia de aprendizaje matemático.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- How to Use Section -->
+    <section id="how-to-use" class="landing-section">
+        <div class="landing-container">
+            <h2 class="landing-section-title">Cómo Usar ISIMath</h2>
+            <div class="landing-section-content">
+                <p>ISIMath es fácil de usar y está diseñado para adaptarse a tu nivel de conocimiento:</p>
+                <br>
+                <p><strong>1. Registro:</strong> Crea tu cuenta gratuita para comenzar</p>
+                <p><strong>2. Evaluación:</strong> Realiza una evaluación inicial para determinar tu nivel</p>
+                <p><strong>3. Aprendizaje:</strong> Sigue los módulos personalizados según tu progreso</p>
+                <p><strong>4. Práctica:</strong> Resuelve ejercicios adaptativos que se ajustan a tu ritmo</p>
+                <p><strong>5. Progreso:</strong> Monitorea tu avance y logros en tiempo real</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Footer -->
+    <footer id="contact" class="landing-footer">
+        <div class="landing-footer-content">
+            <h3 class="landing-footer-title">Contacto</h3>
+            <p class="landing-footer-text">
+                ¿Tienes preguntas o sugerencias? Nos encantaría escucharte.
+            </p>
+            <p class="landing-footer-text">
+                Email: contact@isimath.com | Teléfono: +51 999 888 777
+            </p>
+            <br>
+            <p class="landing-footer-text">
+                © 2025 ISIMath. Todos los derechos reservados.
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        // Variables globales
+        const body = document.body;
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const mobileSidebar = document.getElementById('mobileSidebar');
+        const mobileCloseBtn = document.getElementById('mobileCloseBtn');
+        const overlay = document.getElementById('overlay');
+        const darkToggle = document.getElementById('darkToggle');
+        const darkToggleMobile = document.getElementById('darkToggleMobile');
+        const header = document.querySelector('.landing-header');
+
+        // Función para alternar modo oscuro
+        function toggleDarkMode() {
+            body.classList.toggle('dark');
+            header.classList.toggle('dark');
+            mobileSidebar.classList.toggle('dark');
+            mobileCloseBtn.classList.toggle('dark');
+            
+            // Alternar todas las secciones
+            document.querySelectorAll('.landing-section').forEach(section => {
+                section.classList.toggle('dark');
+            });
+            
+            document.querySelector('.landing-footer').classList.toggle('dark');
+            
+            // Alternar enlaces móviles
+            document.querySelectorAll('.landing-mobile-nav-link').forEach(link => {
+                link.classList.toggle('dark');
+            });
+            
+            // Cambiar icono del botón
+            const icon = body.classList.contains('dark') ? '☀️' : '🌙';
+            darkToggle.textContent = icon;
+            darkToggleMobile.textContent = icon;
+            
+            // Guardar preferencia
+            localStorage.setItem('darkMode', body.classList.contains('dark'));
+        }
+
+        // Función para abrir menú móvil
+        function openMobileMenu() {
+            mobileSidebar.classList.add('active');
+            overlay.classList.add('active');
+            body.style.overflow = 'hidden';
+        }
+
+        // Función para cerrar menú móvil
+        function closeMobileMenu() {
+            mobileSidebar.classList.remove('active');
+            overlay.classList.remove('active');
+            body.style.overflow = 'auto';
+        }
+
+        // Función para navegación suave
+        function smoothScroll(targetId) {
+            const targetElement = document.getElementById(targetId);
+            if (targetElement) {
+                const headerHeight = header.offsetHeight;
+                const targetPosition = targetElement.offsetTop - headerHeight;
+                
+                window.scrollTo({
+                    top: targetPosition,
+                    behavior: 'smooth'
+                });
+            }
+        }
+
+        // Event listeners
+        darkToggle.addEventListener('click', toggleDarkMode);
+        darkToggleMobile.addEventListener('click', toggleDarkMode);
+        mobileMenuBtn.addEventListener('click', openMobileMenu);
+        mobileCloseBtn.addEventListener('click', closeMobileMenu);
+        overlay.addEventListener('click', closeMobileMenu);
+
+        // Navegación suave para todos los enlaces
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href').substring(1);
+                smoothScroll(targetId);
+                
+                // Cerrar menú móvil si está abierto
+                if (mobileSidebar.classList.contains('active')) {
+                    closeMobileMenu();
+                }
+            });
+        });
+
+        // Cerrar menú móvil al redimensionar ventana
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 768) {
+                closeMobileMenu();
+            }
+        });
+
+        // Cargar preferencia de modo oscuro
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedDarkMode = localStorage.getItem('darkMode');
+            if (savedDarkMode === 'true') {
+                toggleDarkMode();
+            }
+        });
+
+        // Efecto de scroll en el header
+        window.addEventListener('scroll', function() {
+            if (window.scrollY > 50) {
+                header.style.background = body.classList.contains('dark') 
+                    ? 'rgba(0, 0, 0, 0.9)' 
+                    : 'rgba(255, 255, 255, 0.9)';
+            } else {
+                header.style.background = body.classList.contains('dark') 
+                    ? 'rgba(0, 0, 0, 0.3)' 
+                    : 'rgba(255, 255, 255, 0.1)';
+            }
+        });
+    </script>
+</body>
+</html>
