@@ -23,18 +23,18 @@ document.addEventListener('DOMContentLoaded', () => {
             // --- Lógica del Tema (Oscuro/Claro) ---
             const applyTheme = (theme) => {
                 if (theme === 'dark') {
-                    body.classList.add('dark');
+                    document.body.classList.add('dark');
                     iconSun.classList.add('app__hidden');
                     iconMoon.classList.remove('app__hidden');
                 } else {
-                    body.classList.remove('dark');
+                    document.body.classList.remove('dark');
                     iconSun.classList.remove('app__hidden');
                     iconMoon.classList.add('app__hidden');
                 }
             };
             
             themeToggleButton.addEventListener('click', () => {
-                const newTheme = body.classList.contains('dark') ? 'light' : 'dark';
+                const newTheme = body.classList.contains('dark') ? 'dark' : 'light';
                 localStorage.setItem('theme', newTheme);
                 applyTheme(newTheme);
             });
@@ -68,7 +68,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 breadcrumbs.textContent = path;
             };
 
-            logo.addEventListener('click', resetView);
+            logo.addEventListener('click', () => {
+                document.location.href = "/index.html";
+                console.log(document.location.href);
+            });
 
             navLinks.forEach(link => {
                 link.addEventListener('click', (e) => {
@@ -141,5 +144,8 @@ document.addEventListener('DOMContentLoaded', () => {
             mobileCloseBtn.addEventListener('click', () => {
                 mobileNav.classList.remove('open');
             });
+
+
+
 
         });

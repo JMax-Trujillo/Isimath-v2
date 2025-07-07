@@ -1,24 +1,6 @@
 /* --- Variables de Color y Estilos Base --- */
-        :root {
-            --integralesD-bg-light: #F0F2F5;
-            --integralesD-bg-dark: #1a1a2e;
-            --integralesD-surface-light: #FFFFFF;
-            --integralesD-surface-dark: #16213E;
-            --integralesD-primary-light: #6A5ACD; /* Morado similar a la imagen */
-            --integralesD-primary-dark: #7B68EE;
-            --integralesD-secondary-light: #20B2AA; /* Teal similar a la imagen */
-            --integralesD-secondary-dark: #48D1CC;
-            --integralesD-text-light: #0D0D0D;
-            --integralesD-text-dark: #E0E0E0;
-            --integralesD-text-muted-light: #6c757d;
-            --integralesD-text-muted-dark: #a0a0a0;
-            --integralesD-border-light: #dee2e6;
-            --integralesD-border-dark: #495057;
-            --integralesD-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-            --integralesD-shadow-dark: 0 4px 15px rgba(0, 0, 0, 0.2);
-        }
 
-        body {
+        /* body {
             margin: 0;
             font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
             background-color: var(--integralesD-bg-light);
@@ -29,7 +11,7 @@
         body.dark {
             background-color: var(--integralesD-bg-dark);
             color: var(--integralesD-text-dark);
-        }
+        } */
 
         /* Contenedor principal de la aplicación de integrales */
         .integralesD__main-container {
@@ -186,9 +168,11 @@
             font-size: 0.9rem;
         }
 
+        #app__integrales-definidas-container {
+            width: 80vw;
+        }
+
         /* Responsive: Escritorio */
         @media (min-width: 768px) {
-            .integralesD__main-container {
-                flex-direction: row; /* Horizontal en escritorio */
-            }
+            
         }

@@ -1,22 +1,4 @@
 /* --- Variables de Color y Estilos Base (Tomadas de tu documento) --- */
-        :root {
-            --limites-bg-light: #F0F2F5;
-            --limites-bg-dark: #1a1a2e;
-            --limites-surface-light: #FFFFFF;
-            --limites-surface-dark: #16213E;
-            --limites-primary-light: #6A5ACD; /* Morado similar a la imagen */
-            --limites-primary-dark: #7B68EE;
-            --limites-secondary-light: #20B2AA; /* Teal similar a la imagen */
-            --limites-secondary-dark: #48D1CC;
-            --limites-text-light: #0D0D0D;
-            --limites-text-dark: #E0E0E0;
-            --limites-text-muted-light: #6c757d;
-            --limites-text-muted-dark: #a0a0a0;
-            --limites-border-light: #dee2e6;
-            --limites-border-dark: #495057;
-            --limites-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-            --limites-shadow-dark: 0 4px 15px rgba(0, 0, 0, 0.2);
-        }
 
         body {
             margin: 0;
@@ -188,7 +170,8 @@
 
         /* Responsive: Escritorio */
         @media (min-width: 768px) {
-            .limites__main-container {
-                flex-direction: row; /* Horizontal en escritorio */
+            #app__limites-container {
+                display: flex;
+                flex-direction: row;
             }
         }

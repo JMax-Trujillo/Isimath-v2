@@ -1,4 +1,514 @@
-document.addEventListener('DOMContentLoaded', () => {
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ISIMath - Integrales Indefinidas</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.11.0/math.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/2.26.0/plotly.min.js"></script>
+    <script src="https://unpkg.com/mathlive" defer></script>
+    <link rel="stylesheet" href="https://unpkg.com/mathlive@0.95.0/dist/mathlive-static.css">
+    <style>
+        /* --- Variables de Color y Estilos Base --- */
+        :root {
+            --integralesI-bg-light: #F0F2F5;
+            --integralesI-bg-dark: #1a1a2e;
+            --integralesI-surface-light: #FFFFFF;
+            --integralesI-surface-dark: #16213E;
+            --integralesI-primary-light: #6A5ACD;
+            --integralesI-primary-dark: #7B68EE;
+            --integralesI-secondary-light: #20B2AA;
+            --integralesI-secondary-dark: #48D1CC;
+            --integralesI-text-light: #0D0D0D;
+            --integralesI-text-dark: #E0E0E0;
+            --integralesI-text-muted-light: #6c757d;
+            --integralesI-text-muted-dark: #a0a0a0;
+            --integralesI-border-light: #dee2e6;
+            --integralesI-border-dark: #495057;
+            --integralesI-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --integralesI-shadow-dark: 0 4px 15px rgba(0, 0, 0, 0.2);
+            --integralesI-success-light: #28a745;
+            --integralesI-success-dark: #34d058;
+            --integralesI-error-light: #dc3545;
+            --integralesI-error-dark: #f85149;
+        }
+
+        body {
+            margin: 0;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            background-color: var(--integralesI-bg-light);
+            color: var(--integralesI-text-light);
+            transition: background-color 0.3s ease, color 0.3s ease;
+            min-height: 100vh;
+        }
+
+        body.dark {
+            background-color: var(--integralesI-bg-dark);
+            color: var(--integralesI-text-dark);
+        }
+
+        /* Contenedor principal */
+        .integralesI__main-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            padding: 1.5rem;
+            max-width: 1400px;
+            margin: 2rem auto;
+            background-color: var(--integralesI-surface-light);
+            border-radius: 12px;
+            box-shadow: var(--integralesI-shadow);
+            border: 1px solid var(--integralesI-border-light);
+        }
+
+        body.dark .integralesI__main-container {
+            background-color: var(--integralesI-surface-dark);
+            border: 1px solid var(--integralesI-border-dark);
+            box-shadow: var(--integralesI-shadow-dark);
+        }
+
+        /* Botón de tema */
+        .integralesI__theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: var(--integralesI-primary-light);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            box-shadow: var(--integralesI-shadow);
+        }
+
+        body.dark .integralesI__theme-toggle {
+            background-color: var(--integralesI-primary-dark);
+        }
+
+        .integralesI__theme-toggle:hover {
+            transform: scale(1.1);
+        }
+
+        /* Sección de inputs */
+        .integralesI__input-section {
+            padding: 1.5rem;
+            background-color: var(--integralesI-bg-light);
+            border-radius: 8px;
+            border: 1px solid var(--integralesI-border-light);
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        body.dark .integralesI__input-section {
+            background-color: var(--integralesI-bg-dark);
+            border: 1px solid var(--integralesI-border-dark);
+            box-shadow: inset 0 1px 3px rgba(255,255,255,0.05);
+        }
+
+        .integralesI__input-section h3 {
+            color: var(--integralesI-primary-light);
+            margin-top: 0;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+
+        body.dark .integralesI__input-section h3 {
+            color: var(--integralesI-primary-dark);
+        }
+
+        .integralesI__form-group {
+            margin-bottom: 1rem;
+        }
+
+        .integralesI__form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--integralesI-text-light);
+        }
+
+        body.dark .integralesI__form-group label {
+            color: var(--integralesI-text-dark);
+        }
+
+        .integralesI__math-input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid var(--integralesI-border-light);
+            border-radius: 6px;
+            font-size: 1rem;
+            background-color: var(--integralesI-surface-light);
+            color: var(--integralesI-text-light);
+            transition: border-color 0.2s, box-shadow 0.2s;
+            min-height: 40px;
+        }
+
+        body.dark .integralesI__math-input {
+            background-color: var(--integralesI-surface-dark);
+            color: var(--integralesI-text-dark);
+            border: 2px solid var(--integralesI-border-dark);
+        }
+
+        .integralesI__math-input:focus-within {
+            border-color: var(--integralesI-primary-light);
+            box-shadow: 0 0 0 3px rgba(106, 90, 205, 0.2);
+        }
+
+        body.dark .integralesI__math-input:focus-within {
+            border-color: var(--integralesI-primary-dark);
+            box-shadow: 0 0 0 3px rgba(123, 104, 238, 0.2);
+        }
+
+        .integralesI__button {
+            background-color: var(--integralesI-primary-light);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-top: 1rem;
+            font-size: 1rem;
+        }
+
+        body.dark .integralesI__button {
+            background-color: var(--integralesI-primary-dark);
+        }
+
+        .integralesI__button:hover {
+            background-color: #5A4EBF;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(106, 90, 205, 0.3);
+        }
+
+        body.dark .integralesI__button:hover {
+            background-color: #6A5ACD;
+        }
+
+        .integralesI__button:active {
+            transform: translateY(0);
+        }
+
+        /* Sección de outputs */
+        .integralesI__output-section {
+            padding: 1.5rem;
+            background-color: var(--integralesI-bg-light);
+            border-radius: 8px;
+            border: 1px solid var(--integralesI-border-light);
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        body.dark .integralesI__output-section {
+            background-color: var(--integralesI-bg-dark);
+            border: 1px solid var(--integralesI-border-dark);
+            box-shadow: inset 0 1px 3px rgba(255,255,255,0.05);
+        }
+
+        .integralesI__output-section h3 {
+            color: var(--integralesI-primary-light);
+            margin-top: 0;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+
+        body.dark .integralesI__output-section h3 {
+            color: var(--integralesI-primary-dark);
+        }
+
+        /* Área de resultados */
+        .integralesI__result-display {
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            background-color: var(--integralesI-surface-light);
+            border-radius: 8px;
+            border: 1px solid var(--integralesI-border-light);
+            min-height: 50px;
+            font-size: 1.1rem;
+            color: var(--integralesI-text-light);
+        }
+
+        body.dark .integralesI__result-display {
+            background-color: var(--integralesI-surface-dark);
+            border: 1px solid var(--integralesI-border-dark);
+            color: var(--integralesI-text-dark);
+        }
+
+        .integralesI__result-display.hidden {
+            display: none;
+        }
+
+        .integralesI__result-display h4 {
+            color: var(--integralesI-primary-light);
+            margin-top: 0;
+            margin-bottom: 0.5rem;
+        }
+
+        body.dark .integralesI__result-display h4 {
+            color: var(--integralesI-primary-dark);
+        }
+
+        .integralesI__result-note {
+            font-size: 0.9rem;
+            color: var(--integralesI-text-muted-light);
+            margin-top: 1rem;
+        }
+
+        body.dark .integralesI__result-note {
+            color: var(--integralesI-text-muted-dark);
+        }
+
+        /* Contenedor de pasos */
+        .integralesI__steps-container {
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            background-color: var(--integralesI-surface-light);
+            border-radius: 8px;
+            border: 1px solid var(--integralesI-border-light);
+        }
+
+        body.dark .integralesI__steps-container {
+            background-color: var(--integralesI-surface-dark);
+            border: 1px solid var(--integralesI-border-dark);
+        }
+
+        .integralesI__steps-container.hidden {
+            display: none;
+        }
+
+        .integralesI__steps-container h4 {
+            color: var(--integralesI-primary-light);
+            margin-top: 0;
+            margin-bottom: 1rem;
+        }
+
+        body.dark .integralesI__steps-container h4 {
+            color: var(--integralesI-primary-dark);
+        }
+
+        .integralesI__steps-content {
+            background: var(--integralesI-bg-light);
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid var(--integralesI-primary-light);
+            margin-top: 10px;
+        }
+
+        body.dark .integralesI__steps-content {
+            background: var(--integralesI-bg-dark);
+            border-left-color: var(--integralesI-primary-dark);
+        }
+
+        .integralesI__steps-content.hidden {
+            display: none;
+        }
+
+        .integralesI__step-item {
+            margin-bottom: 15px;
+            padding: 10px;
+            background-color: var(--integralesI-surface-light);
+            border-radius: 6px;
+            border: 1px solid var(--integralesI-border-light);
+        }
+
+        body.dark .integralesI__step-item {
+            background-color: var(--integralesI-surface-dark);
+            border: 1px solid var(--integralesI-border-dark);
+        }
+
+        .integralesI__step-title {
+            font-weight: bold;
+            color: var(--integralesI-primary-light);
+            margin-bottom: 5px;
+        }
+
+        body.dark .integralesI__step-title {
+            color: var(--integralesI-primary-dark);
+        }
+
+        .integralesI__step-rule {
+            font-size: 0.9em;
+            color: var(--integralesI-text-muted-light);
+            font-style: italic;
+            margin-top: 5px;
+        }
+
+        body.dark .integralesI__step-rule {
+            color: var(--integralesI-text-muted-dark);
+        }
+
+        /* Gráfica */
+        .integralesI__graph-container {
+            width: 100%;
+            height: 400px;
+            background-color: var(--integralesI-surface-light);
+            border-radius: 8px;
+            border: 1px solid var(--integralesI-border-light);
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+
+        body.dark .integralesI__graph-container {
+            background-color: var(--integralesI-surface-dark);
+            border: 1px solid var(--integralesI-border-dark);
+        }
+
+        .integralesI__graph-container.hidden {
+            display: none;
+        }
+
+        /* Mensajes de error */
+        .integralesI__error-message {
+            color: var(--integralesI-error-light);
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+            padding: 0.5rem;
+            background-color: rgba(220, 53, 69, 0.1);
+            border-radius: 4px;
+            border: 1px solid rgba(220, 53, 69, 0.3);
+        }
+
+        body.dark .integralesI__error-message {
+            color: var(--integralesI-error-dark);
+            background-color: rgba(248, 81, 73, 0.1);
+            border-color: rgba(248, 81, 73, 0.3);
+        }
+
+        .integralesI__error-message.hidden {
+            display: none;
+        }
+
+        /* Responsive */
+        @media (min-width: 768px) {
+            .integralesI__main-container {
+                flex-direction: row;
+                gap: 2rem;
+            }
+            
+            .integralesI__input-section {
+                flex: 1;
+                max-width: 400px;
+            }
+            
+            .integralesI__output-section {
+                flex: 2;
+            }
+        }
+
+        /* Estilos específicos para math-field */
+        math-field {
+            font-size: 1.1rem;
+            border: none;
+            padding: 0;
+            background: transparent;
+        }
+
+        math-field:focus {
+            outline: none;
+        }
+
+        /* Leyenda de la gráfica */
+        .integralesI__graph-legend {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: var(--integralesI-surface-light);
+            border-radius: 6px;
+            border: 1px solid var(--integralesI-border-light);
+            font-size: 0.9rem;
+        }
+
+        body.dark .integralesI__graph-legend {
+            background-color: var(--integralesI-surface-dark);
+            border: 1px solid var(--integralesI-border-dark);
+        }
+
+        .integralesI__legend-item {
+            display: inline-block;
+            margin-right: 20px;
+            font-weight: bold;
+        }
+
+        .integralesI__legend-original {
+            color: var(--integralesI-secondary-light);
+        }
+
+        .integralesI__legend-integral {
+            color: var(--integralesI-primary-light);
+        }
+
+        body.dark .integralesI__legend-original {
+            color: var(--integralesI-secondary-dark);
+        }
+
+        body.dark .integralesI__legend-integral {
+            color: var(--integralesI-primary-dark);
+        }
+    </style>
+</head>
+<body>
+    <!-- Botón de cambio de tema -->
+    <button id="integralesI__theme-toggle" class="integralesI__theme-toggle">
+        🌙
+    </button>
+
+    <!-- Contenedor principal -->
+    <div class="integralesI__main-container">
+        <!-- Sección de inputs -->
+        <div class="integralesI__input-section">
+            <h3>Calcular Integral Indefinida</h3>
+            <div class="integralesI__form-group">
+                <label for="integralesI__function-input">Función f(x):</label>
+                <div class="integralesI__math-input">
+                    <math-field id="integralesI__function-input" virtual-keyboard-mode="manual">x^2</math-field>
+                </div>
+                <div id="integralesI__function-error" class="integralesI__error-message hidden"></div>
+            </div>
+            <button id="integralesI__solve-btn" class="integralesI__button">Resolver Integral</button>
+        </div>
+
+        <!-- Sección de outputs -->
+        <div class="integralesI__output-section">
+            <h3>Resultado y Visualización</h3>
+            
+            <!-- Resultado -->
+            <div id="integralesI__result" class="integralesI__result-display hidden">
+                <h4>Resultado:</h4>
+                <p>La integral indefinida de la función es:</p>
+                <div id="integralesI__result-math-field" style="font-size: 1.2rem; margin: 1rem 0;"></div>
+                <p class="integralesI__result-note">
+                    Nota: Recuerda añadir la constante de integración "C".
+                </p>
+            </div>
+
+            <!-- Pasos -->
+            <div id="integralesI__steps-container" class="integralesI__steps-container hidden">
+                <h4>Pasos de resolución:</h4>
+                <button id="integralesI__toggle-steps-btn" class="integralesI__button">
+                    Mostrar pasos detallados
+                </button>
+                <div id="integralesI__steps-content" class="integralesI__steps-content hidden">
+                    <div id="integralesI__steps-list"></div>
+                </div>
+            </div>
+
+            <!-- Gráfica -->
+            <div id="integralesI__graph-container" class="integralesI__graph-container hidden">
+                <div id="integralesI__plot" style="width: 100%; height: 100%;"></div>
+            </div>
+            
+            <!-- Leyenda de la gráfica -->
+            <div id="integralesI__graph-legend" class="integralesI__graph-legend hidden">
+                <span class="integralesI__legend-item integralesI__legend-original">━━━ f(x) (función original)</span>
+                <span class="integralesI__legend-item integralesI__legend-integral">━━━ ∫f(x)dx (integral)</span>
+            </div>
+        </div>
+    </div>
+
+<script>
+        document.addEventListener('DOMContentLoaded', () => {
             // Referencias a elementos del DOM
             const integralesI__functionInput = document.getElementById('integralesI__function-input');
             const integralesI__solveBtn = document.getElementById('integralesI__solve-btn');
@@ -11,12 +521,23 @@ document.addEventListener('DOMContentLoaded', () => {
             const integralesI__stepsList = document.getElementById('integralesI__steps-list');
             const integralesI__graphContainer = document.getElementById('integralesI__graph-container');
             const integralesI__graphLegend = document.getElementById('integralesI__graph-legend');
-            // const integralesI__themeToggle = document.getElementById('integralesI__theme-toggle');
+            const integralesI__themeToggle = document.getElementById('integralesI__theme-toggle');
 
             // Variables para almacenar las funciones y pasos
             let integralesI__originalFunction = null;
             let integralesI__integralFunction = null;
             let integralesI__integrationSteps = [];
+
+            // Manejo del tema
+            integralesI__themeToggle.addEventListener('click', () => {
+                document.body.classList.toggle('dark');
+                integralesI__themeToggle.textContent = document.body.classList.contains('dark') ? '☀️' : '🌙';
+                
+                // Actualizar gráfica si existe
+                if (integralesI__originalFunction && integralesI__integralFunction) {
+                    integralesI__drawGraph(integralesI__originalFunction, integralesI__integralFunction);
+                }
+            });
 
             // Manejar el toggle de pasos
             integralesI__toggleStepsBtn.addEventListener('click', () => {
@@ -541,3 +1062,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 integralesI__calculateIndefiniteIntegral(functionText);
             });
         });
+    </script>
+</body>
+</html>
