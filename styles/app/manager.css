@@ -257,6 +257,7 @@
             text-align: center;
             border: 1px solid var(--app-border-light);
             transition: transform 0.2s ease, box-shadow 0.2s ease;
+            cursor: pointer;
         }
         .app__card:hover {
             transform: translateY(-5px);
@@ -303,19 +304,12 @@
             padding: 0.75rem 1.5rem;
             border-radius: 8px;
             font-weight: 600;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
-        .app__card-button:hover {
-            background-color: #5848b7;
+            pointer-events: none; /* El click se maneja en la tarjeta padre */
         }
         body.dark .app__card-button {
             background-color: var(--app-primary-dark);
         }
-        body.dark .app__card-button:hover {
-            background-color: #6a5acd;
-        }
-
+        
         /* --- SVG Rotatorio --- */
         .app__rotating-svg-container {
             width: 100%;
@@ -339,12 +333,13 @@
             background-color: var(--app-surface-light);
             padding: 2rem;
             border-radius: 12px;
-            width: 100%;
-            max-width: 900px;
-            margin-top: 2rem;
+            width: 80vw;
             box-shadow: var(--app-shadow);
             border: 1px solid var(--app-border-light);
             text-align: center;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
         }
         body.dark .app__content-section {
             background-color: var(--app-surface-dark);
@@ -396,6 +391,10 @@
             }
             .app__welcome-title {
                 font-size: 2.5rem;
+            }
+            .app__content-section {
+                display: flex;
+                gap: 1rem;  
             }
         }
 

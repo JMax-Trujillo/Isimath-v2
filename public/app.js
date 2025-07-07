@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const calculoCards = document.getElementById('app__calculo-cards');
             const matricesCards = document.getElementById('app__matrices-cards');
             const rotatingSvgContainer = document.getElementById('app__rotating-svg-container');
-            const contentSectionsContainer = document.getElementById('app__content-sections');
+            const allContentSections = document.querySelectorAll('.app__content-section');
             const breadcrumbs = document.getElementById('app__breadcrumbs');
             const logo = document.getElementById('app__logo');
             const mobileMenuBtn = document.getElementById('app__mobile-menu-btn');
@@ -49,7 +49,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 calculoCards.classList.add('app__hidden');
                 matricesCards.classList.add('app__hidden');
                 rotatingSvgContainer.classList.add('app__hidden');
-                contentSectionsContainer.innerHTML = '';
+                allContentSections.forEach(sec => sec.classList.add('app__hidden'));
                 mainContent.classList.remove('app__hidden');
                 navLinks.forEach(l => l.classList.remove('active'));
                 currentSection = '';
@@ -104,24 +104,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 currentTool = toolName;
                 updateBreadcrumbs();
                 
-                contentSectionsContainer.innerHTML = '';
-                const contentDiv = document.createElement('div');
-                contentDiv.id = `app__${targetId}-container`;
-                contentDiv.className = 'app__content-section';
-                contentDiv.innerHTML = `
-                    <h2>Hola ${toolName}</h2>
-                    <svg class="app__content-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                        <polyline points="14 2 14 8 20 8"></polyline>
-                        <line x1="16" y1="13" x2="8" y2="13"></line>
-                        <line x1="16" y1="17" x2="8" y2="17"></line>
-                        <polyline points="10 9 9 9 8 9"></polyline>
-                    </svg>
-                    <p style="margin-top: 1rem;">Contenido para ${toolName} aparecerá aquí.</p>
-                `;
-                contentSectionsContainer.appendChild(contentDiv);
+                // Ocultar todas las secciones de contenido
+                allContentSections.forEach(sec => sec.classList.add('app__hidden'));
+                
+                // Mostrar la sección correcta
+                const targetSection = document.getElementById(`app__${targetId}-container`);
+                if(targetSection) {
+                    targetSection.classList.remove('app__hidden');
+                }
             };
 
+            // Delegación de eventos para las tarjetas
             document.getElementById('app__calculo-cards').addEventListener('click', (e) => {
                 const card = e.target.closest('.app__card');
                 if (card) {
