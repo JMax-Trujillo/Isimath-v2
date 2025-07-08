@@ -1,3 +1,5 @@
+const { createElement } = require("react");
+
 document.addEventListener('DOMContentLoaded', () => {
             // Referencias a elementos del DOM
             const integralesI__functionInput = document.getElementById('integralesI__function-input');
@@ -540,4 +542,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 integralesI__calculateIndefiniteIntegral(functionText);
             });
+
+            // TODO: Moviendo el MathField
+            const integralesI__containerTest = document.querySelector('.integralesI__input-section');
+            const integralesI__mathfieldInput = document.getElementById('integralesI__function-input');
+
+            let test = integralesI__mathfieldInput.shadowRoot;
+            
+            
+            
+            
+            
+            
+            const integralesI__test = createElement('h2');
+            integralesI__test.textContent = `${test}`;
+
+            // integralesI__containerTest.appendChild(test);
+
+
         });
