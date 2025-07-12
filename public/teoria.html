@@ -340,28 +340,28 @@
             <div class="topics-section">
                 <!-- Temas numerados -->
                 <div class="topic-item" data-topic="1">
-                    <span class="topic-number">1.</span> Límites
+                    <span class="topic-number">1.</span> <a href="/assets/docs/teorialimites.html">Límites</a>
                 </div>
                 <div class="topic-item" data-topic="2">
-                    <span class="topic-number">2.</span> Límites
+                    <span class="topic-number">2.</span> <a href="/assets/docs/teoriaderivadas.html">Derivadas</a>
                 </div>
                 <div class="topic-item" data-topic="3">
-                    <span class="topic-number">3.</span> Derivadas
+                    <span class="topic-number">3.</span> <a href="/assets/docs/integralesindefinidas.html">Integrales Indefinidas</a>
                 </div>
                 <div class="topic-item" data-topic="4">
-                    <span class="topic-number">4.</span> Derivadas
+                    <span class="topic-number">4.</span> <a href="/assets/docs/integralesdefinidas.html">Integrales Definidas</a>
                 </div>
                 <div class="topic-item" data-topic="5">
-                    <span class="topic-number">5.</span> Límites
+                    <span class="topic-number">5.</span> <a href="/assets/docs/operacionesbasicas.html">Operaciones Basica</a>
                 </div>
                 <div class="topic-item" data-topic="6">
-                    <span class="topic-number">6.</span> Derivadas
+                    <span class="topic-number">6.</span> <a href="/assets/docs/determinante.html">Determinantes</a>
                 </div>
                 <div class="topic-item" data-topic="7">
-                    <span class="topic-number">7.</span> Derivadas
+                    <span class="topic-number">7.</span> <a href="/assets/docs/inversa.html">Inversas</a>
                 </div>
                 <div class="topic-item" data-topic="8">
-                    <span class="topic-number">8.</span> Derivadas
+                    <span class="topic-number">8.</span> <a href="/assets/docs/iteraciones.html">Iterativos</a>
                 </div>
             </div>
 
@@ -386,43 +386,6 @@
                 // Si no hay tema guardado o es 'light', asegúrate de que no tenga la clase 'dark'
                 document.body.classList.remove('dark');
             }
-        });
-
-        // Get all topic items
-        const topicItems = document.querySelectorAll('.topic-item');
-        // Get the visual area element (no longer needed for content update, but kept for reference)
-        const visualArea = document.getElementById('visualArea');
-
-        // Define target URLs for each topic
-        const topicUrls = {
-            '1': 'https://es.wikipedia.org/wiki/L%C3%ADmite_matem%C3%A1tico',
-            '2': 'https://www.universoformulas.com/matematicas/calculo/limites/',
-            '3': 'https://es.wikipedia.org/wiki/Derivada',
-            '4': 'https://www.universoformulas.com/matematicas/calculo/reglas-derivacion/',
-            '5': 'https://www.matesfacil.com/calculo/limites/aplicaciones-limites.html',
-            '6': 'https://www.universoformulas.com/matematicas/calculo/derivacion-implicita/',
-            '7': 'https://www.matesfacil.com/calculo/derivadas/problemas-optimizacion-derivadas.html',
-            '8': 'https://es.wikipedia.org/wiki/Teorema_fundamental_del_c%C3%A1lculo'
-        };
-
-        // Add click event listener to each topic item
-        topicItems.forEach(item => {
-            item.addEventListener('click', () => {
-                const topicNumber = item.dataset.topic; // Get the topic number from data-topic attribute
-                const targetUrl = topicUrls[topicNumber];
-
-                if (targetUrl) {
-                    // Redirect to the new URL
-                    window.location.href = targetUrl;
-                } else {
-                    // Optionally, show a message in the visual area if no URL is defined
-                    visualArea.innerHTML = `
-                        <span class="monkey-emoji" role="img" aria-label="Error">❓</span>
-                        <span>No hay enlace disponible para este tema.</span>
-                    `;
-                    console.error('No URL defined for topic:', topicNumber);
-                }
-            });
         });
     </script>
 </body>

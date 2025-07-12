@@ -4,8 +4,8 @@
             --app-bg-dark: #1a1a2e;
             --app-surface-light: #FFFFFF;
             --app-surface-dark: #16213E;
-            --app-primary-light: #6A5ACD; /* Morado similar a la imagen */
-            --app-primary-dark: #7B68EE;
+            --app-primary-light: #3567f0; /* Morado similar a la imagen */
+            --app-primary-dark: #44c4ff;
             --app-secondary-light: #20B2AA; /* Teal similar a la imagen */
             --app-secondary-dark: #48D1CC;
             --app-text-light: #0D0D0D;
@@ -170,21 +170,6 @@
 body.dark {
     background-color: var(--app-bg-dark); /* Estilo para el modo oscuro */
     color: var(--app-text-dark); /* Estilo para el modo oscuro */
-}
-
-.app__back svg {
-    border-radius: 100%;
-    width: 2rem;
-    background-color: #5f18bb;
-    color: rgb(220, 228, 250);
-    position: fixed;
-    left: 2rem;
-    top: 2rem;
-    transition: all .2 ease;
-}
-.app_back svg:hover {
-    background-color: #1944e0;
-    color: rgb(23, 32, 56);
 }
 
         /* --- Clases de Utilidad --- */
@@ -357,6 +342,7 @@ body.dark {
         /* --- Contenido Principal --- */
         .app__main-content {
             flex-grow: 1;
+            padding: 1.5rem;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -522,7 +508,6 @@ body.dark {
 
         /* --- Responsive: Tablet --- */
         @media (min-width: 768px) {
-
             .app__mobile-menu-btn {
                 display: none;
             }
@@ -534,9 +519,8 @@ body.dark {
             }
             .app__main-content {
                 flex-direction: row;
-                align-items: center;
+                align-items: flex-start;
                 gap: 2rem;
-                height: 100vh;
             }
             .app__cards-container.full-width {
                 flex-grow: 1;

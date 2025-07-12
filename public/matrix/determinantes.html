@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Determinantes - Álgebra Lineal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --midnight-blue: #0f172a;
+            --deep-blue: #1e293b;
+            --navy-blue: #1e3a8a;
+            --electric-blue: #3b82f6;
+            --light-blue: #60a5fa;
+            --pale-blue: #bfdbfe;
+            --dark-gray: #0f172a;
+            --medium-gray: #334155;
+            --light-gray: #94a3b8;
+            --white: #f8fafc;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--midnight-blue);
+            color: var(--white);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+        }
+        
+        .math-display {
+            font-size: 1.1rem;
+            overflow-x: auto;
+            overflow-y: hidden;
+            color: var(--pale-blue);
+        }
+        
+        .formula-card {
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(2, 6, 23, 0.3);
+            overflow: hidden;
+            background-color: var(--deep-blue);
+            border: 1px solid var(--medium-gray);
+            border-radius: 0.75rem;
+        }
+        
+        .formula-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 12px rgba(2, 6, 23, 0.5);
+            border-color: var(--electric-blue);
+        }
+        
+        .content-container {
+            max-width: 95%;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+        
+        .header-section {
+            background: linear-gradient(135deg, var(--navy-blue) 0%, #172554 100%);
+            padding: 3rem 2rem;
+            color: white;
+            position: relative;
+            overflow: hidden;
+            border-bottom: 1px solid rgba(59, 130, 246, 0.2);
+        }
+        
+        .header-section::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 20% 50%, rgba(59, 130, 246, 0.1) 0%, transparent 70%);
+            z-index: 0;
+        }
+        
+        .header-content {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+        
+        @media (min-width: 1024px) {
+            .main-grid {
+                grid-template-columns: 2fr 1fr;
+            }
+        }
+        
+        .content-card {
+            background-color: var(--deep-blue);
+            box-shadow: 0 2px 4px rgba(2, 6, 23, 0.3);
+            border: 1px solid var(--medium-gray);
+            border-radius: 0.75rem;
+        }
+        
+        .title-accent {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .title-accent::after {
+            content: "";
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            width: 50%;
+            height: 3px;
+            background: linear-gradient(90deg, var(--electric-blue), transparent);
+            border-radius: 3px;
+        }
+        
+        .text-primary {
+            color: var(--white);
+        }
+        
+        .text-secondary {
+            color: var(--light-gray);
+        }
+        
+        .bg-light {
+            background-color: rgba(30, 41, 59, 0.7);
+            border: 1px solid var(--medium-gray);
+        }
+        
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: var(--midnight-blue);
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--navy-blue);
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--electric-blue);
+        }
+        
+        input[type="number"] {
+            -moz-appearance: textfield;
+        }
+        input[type="number"]::-webkit-outer-spin-button,
+        input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        .matrix-input-grid {
+            display: grid;
+            gap: 0.5rem;
+        }
+
+        .matrix-input-grid input {
+            width: 100%;
+            padding: 0.5rem;
+            background-color: var(--dark-gray);
+            border: 1px solid var(--medium-gray);
+            border-radius: 0.25rem;
+            color: var(--white);
+            text-align: center;
+        }
+
+        .result-display-area {
+            min-height: 100px;
+            background-color: var(--dark-gray);
+            border: 1px solid var(--medium-gray);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow-x: auto;
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--electric-blue);
+        }
+
+        .message-box {
+            background-color: var(--navy-blue);
+            color: var(--white);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-top: 1rem;
+            display: none; /* Hidden by default */
+            border: 1px solid var(--electric-blue);
+        }
+        .message-box.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header Section -->
+    <div class="header-section">
+        <div class="header-content content-container">
+            <h1 class="text-4xl md:text-5xl font-bold font-poppins mb-4 title-accent">CALCULADORA DE DETERMINANTES</h1>
+            <div class="max-w-3xl bg-white/5 p-6 rounded-xl border border-white/10 backdrop-blur-sm">
+                <p class="text-lg text-white/90 leading-relaxed">
+                    Calcula el determinante de una matriz cuadrada utilizando el método de Sarrus (para 3x3) o la expansión por cofactores.
+                </p>
+                <div class="mt-4 flex items-center text-white/80">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1 text-electric-blue" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2h-1V9z" clip-rule="evenodd" />
+                    </svg>
+                    <span class="text-sm font-medium">Herramienta interactiva de álgebra lineal</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="content-container py-8">
+        <div class="main-grid">
+            <!-- Left Column - Matrix Inputs and Operations -->
+            <div>
+                <section class="mb-12 content-card shadow-sm p-6">
+                    <h2 class="text-2xl font-bold font-poppins text-primary mb-6 flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2 text-electric-blue" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                        </svg>
+                        <span class="title-accent">Definir Matriz Cuadrada</span>
+                    </h2>
+                    
+                    <!-- Matrix Input -->
+                    <div class="bg-dark-gray rounded-xl overflow-hidden border border-medium-gray p-6 mb-6">
+                        <h3 class="text-xl font-semibold text-primary mb-4">Matriz A</h3>
+                        <div class="flex items-center space-x-4 mb-4">
+                            <label for="matrixSize" class="text-light-gray">Tamaño (n x n):</label>
+                            <input type="number" id="matrixSize" value="3" min="2" max="5" class="w-20 p-2 rounded-md bg-medium-gray text-white border border-medium-gray" onchange="generateMatrixInputs()">
+                        </div>
+                        <div id="matrixAInputs" class="matrix-input-grid"></div>
+                    </div>
+
+                    <!-- Operation Method Selection -->
+                    <div class="bg-dark-gray rounded-xl overflow-hidden border border-medium-gray p-6 mb-6">
+                        <h3 class="text-xl font-semibold text-primary mb-4">Seleccionar Método de Cálculo</h3>
+                        <div class="flex flex-wrap justify-center gap-4">
+                            <button id="sarrusBtn" class="bg-electric-blue hover:bg-light-blue text-white font-bold py-3 px-6 rounded-lg transition duration-200" onclick="calculateDeterminant('sarrus')">
+                                Método de Sarrus (Solo 3x3)
+                            </button>
+                            <button id="cofactorsBtn" class="bg-electric-blue hover:bg-light-blue text-white font-bold py-3 px-6 rounded-lg transition duration-200" onclick="calculateDeterminant('cofactors')">
+                                Expansión por Cofactores
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Message Box for Errors/Info -->
+                    <div id="messageBox" class="message-box"></div>
+
+                    <!-- Result Display -->
+                    <div class="bg-dark-gray rounded-xl overflow-hidden border border-medium-gray p-6">
+                        <h3 class="text-xl font-semibold text-primary mb-4">Resultado del Determinante</h3>
+                        <div id="resultDeterminantDisplay" class="result-display-area text-center">
+                            <p class="text-light-gray text-base font-normal">El determinante aparecerá aquí.</p>
+                        </div>
+                    </div>
+                </section>
+            </div>
+            
+            <!-- Right Column - Formulas -->
+            <div>
+                <section class="mb-8 content-card shadow-sm p-6">
+                    <h2 class="text-2xl font-bold font-poppins text-primary mb-6 flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2 text-electric-blue" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                        </svg>
+                        <span class="title-accent">Fórmulas Esenciales</span>
+                    </h2>
+                    
+                    <div class="space-y-4">
+                        <div class="formula-card p-4">
+                            <h3 class="font-semibold text-primary mb-2">Matriz 2×2</h3>
+                            <div class="text-center my-2 math-display text-pale-blue">$$\begin{vmatrix} a & b \\ c & d \end{vmatrix} = ad - bc$$</div>
+                            <p class="text-sm text-light-gray">Fórmula directa para matrices pequeñas.</p>
+                        </div>
+                        
+                        <div class="formula-card p-4">
+                            <h3 class="font-semibold text-primary mb-2">Regla de Sarrus (3×3)</h3>
+                            <div class="text-center my-2 math-display text-pale-blue">
+                                $$\begin{vmatrix} a & b & c \\ d & e & f \\ g & h & i \end{vmatrix} = aei + bfg + cdh - ceg - bdi - afh$$
+                            </div>
+                            <p class="text-sm text-light-gray">Mnemotécnica para matrices 3×3.</p>
+                        </div>
+
+                        <div class="formula-card p-4">
+                            <h3 class="font-semibold text-primary mb-2">Expansión por Cofactores</h3>
+                            <div class="text-center my-2 math-display text-pale-blue">$$\det(A) = \sum_{j=1}^n (-1)^{i+j} a_{ij} \det(M_{ij})$$</div>
+                            <p class="text-sm text-light-gray">Para cualquier fila \( i \) o columna \( j \). \( M_{ij} \) es el menor.</p>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Function to generate matrix input fields based on size
+        function generateMatrixInputs() {
+            const sizeInput = document.getElementById('matrixSize');
+            const container = document.getElementById('matrixAInputs');
+            const size = parseInt(sizeInput.value);
+
+            // Validate size input
+            if (isNaN(size) || size < 2 || size > 5) {
+                container.innerHTML = '<p class="text-red-400">Por favor, introduce un tamaño válido (entre 2 y 5).</p>';
+                document.getElementById('sarrusBtn').disabled = true;
+                document.getElementById('cofactorsBtn').disabled = true;
+                return;
+            }
+
+            container.innerHTML = ''; // Clear previous inputs
+            container.style.gridTemplateColumns = `repeat(${size}, minmax(0, 1fr))`;
+
+            // Enable/disable Sarrus button based on size
+            document.getElementById('sarrusBtn').disabled = (size !== 3);
+            document.getElementById('cofactorsBtn').disabled = false;
+
+            for (let i = 0; i < size; i++) {
+                for (let j = 0; j < size; j++) {
+                    const input = document.createElement('input');
+                    input.type = 'number';
+                    input.value = '0'; // Default value
+                    input.id = `matrixA-${i}-${j}`;
+                    input.classList.add('p-2', 'rounded-md', 'bg-medium-gray', 'text-white', 'border', 'border-medium-gray', 'text-center');
+                    container.appendChild(input);
+                }
+            }
+        }
+
+        // Function to get matrix values from input fields
+        function getMatrix() {
+            const size = parseInt(document.getElementById('matrixSize').value);
+            const matrix = [];
+
+            for (let i = 0; i < size; i++) {
+                const row = [];
+                for (let j = 0; j < size; j++) {
+                    const input = document.getElementById(`matrixA-${i}-${j}`);
+                    row.push(parseFloat(input.value || '0')); // Default to 0 if empty or invalid
+                }
+                matrix.push(row);
+            }
+            return matrix;
+        }
+
+        // Function to display a message in the message box
+        function showMessage(message, type = 'info') {
+            const messageBox = document.getElementById('messageBox');
+            messageBox.textContent = message;
+            messageBox.classList.remove('bg-navy-blue', 'bg-red-700', 'border-electric-blue', 'border-red-500');
+            messageBox.classList.add('active');
+
+            if (type === 'error') {
+                messageBox.classList.add('bg-red-700', 'border-red-500');
+            } else {
+                messageBox.classList.add('bg-navy-blue', 'border-electric-blue');
+            }
+        }
+
+        // Function to hide the message box
+        function hideMessageBox() {
+            document.getElementById('messageBox').classList.remove('active');
+        }
+
+        // Function to display the determinant result
+        function displayDeterminant(result) {
+            const displayElement = document.getElementById('resultDeterminantDisplay');
+            if (result === null) {
+                displayElement.innerHTML = '<p class="text-light-gray text-base font-normal">No se pudo calcular el determinante.</p>';
+            } else {
+                displayElement.innerHTML = `$$\\det(A) = ${result}$$`;
+                if (typeof MathJax !== 'undefined') MathJax.typesetPromise([displayElement]);
+            }
+        }
+
+        // --- Determinant Calculation Methods ---
+
+        // Determinant for 2x2 matrix
+        function determinant2x2(matrix) {
+            return (matrix[0][0] * matrix[1][1]) - (matrix[0][1] * matrix[1][0]);
+        }
+
+        // Determinant for 3x3 matrix using Sarrus' Rule
+        function sarrusRule(matrix) {
+            // Check if matrix is 3x3
+            if (matrix.length !== 3 || matrix[0].length !== 3) {
+                showMessage('Error: La Regla de Sarrus solo aplica para matrices 3x3.', 'error');
+                return null;
+            }
+            hideMessageBox();
+            const [a, b, c] = matrix[0];
+            const [d, e, f] = matrix[1];
+            const [g, h, i] = matrix[2];
+
+            return (a * e * i) + (b * f * g) + (c * d * h) - (c * e * g) - (b * d * i) - (a * f * h);
+        }
+
+        // Function to get a submatrix (minor) for cofactor expansion
+        function getSubmatrix(matrix, rowToRemove, colToRemove) {
+            return matrix.filter((row, i) => i !== rowToRemove)
+                         .map(row => row.filter((val, j) => j !== colToRemove));
+        }
+
+        // Determinant using Cofactor Expansion (recursive)
+        function cofactorExpansion(matrix) {
+            const n = matrix.length;
+
+            // Base cases
+            if (n === 1) {
+                return matrix[0][0];
+            }
+            if (n === 2) {
+                return determinant2x2(matrix);
+            }
+
+            let det = 0;
+            // Expand along the first row (can be any row/column)
+            for (let j = 0; j < n; j++) {
+                const submatrix = getSubmatrix(matrix, 0, j);
+                const sign = (j % 2 === 0) ? 1 : -1; // (-1)^(0+j)
+                det += sign * matrix[0][j] * cofactorExpansion(submatrix);
+            }
+            return det;
+        }
+
+        // Main function to calculate determinant based on selected method
+        function calculateDeterminant(method) {
+            const matrix = getMatrix();
+            const size = matrix.length;
+
+            // Basic validation for square matrix
+            if (size === 0 || matrix[0].length !== size) {
+                showMessage('Error: La matriz debe ser cuadrada (n x n) y no vacía.', 'error');
+                displayDeterminant(null);
+                return;
+            }
+
+            let result = null;
+            if (method === 'sarrus') {
+                if (size !== 3) {
+                    showMessage('Error: El método de Sarrus solo es aplicable para matrices 3x3.', 'error');
+                    displayDeterminant(null);
+                    return;
+                }
+                result = sarrusRule(matrix);
+            } else if (method === 'cofactors') {
+                hideMessageBox(); // Clear any previous Sarrus-specific error
+                result = cofactorExpansion(matrix);
+            }
+            
+            displayDeterminant(result);
+        }
+
+        // Initial setup on DOMContentLoaded
+        document.addEventListener('DOMContentLoaded', function() {
+            generateMatrixInputs(); // Generate inputs for initial 3x3 matrix
+            
+            // Ensure MathJax renders initially
+            if (typeof MathJax !== 'undefined') {
+                MathJax.typesetPromise();
+            }
+        });
+    </script>
+</body>
+</html>
