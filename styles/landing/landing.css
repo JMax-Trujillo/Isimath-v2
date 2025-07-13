@@ -218,8 +218,9 @@ body.dark {
 
 .hero__app {
     background-color: var(--light-accent-blue);
-    color: #ffffff;
+    color: #26262c;
     border: 2px solid var(--light-accent-blue);
+    font-weight: 800;
 }
 
 .hero__app:hover {
@@ -236,8 +237,9 @@ body.dark {
 
 .hero__more:hover {
     background-color: var(--light-accent-blue);
-    color: #ffffff;
+    color: #26262c;
     transform: translateY(-3px);
+    font-weight: 800;
 }
 
 /* Estilos para la sección de visión */
