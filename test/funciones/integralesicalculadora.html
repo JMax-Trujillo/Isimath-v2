@@ -471,13 +471,10 @@
         body.dark .integralesI__legend-integral {
             color: var(--integralesI-primary-dark); /* Color primario azul para modo oscuro */
         }
-        .app__hidden {
-            display: none;
-        }
     </style>
 </head>
 <body>
-    <button id="integralesI__theme-toggle" class="integralesI__theme-toggle app__hidden">
+    <button id="integralesI__theme-toggle" class="integralesI__theme-toggle">
         🌙
     </button>
 
@@ -530,13 +527,6 @@
     </div>
 
 <script>
-
-    const darkMode = localStorage.getItem("theme");
-
-if (darkMode === "dark") {
-    // Aplica clase al body para activar modo oscuro
-    document.body.classList.add("dark");
-}
         document.addEventListener('DOMContentLoaded', () => {
             // Referencias a elementos del DOM
             const integralesI__functionInput = document.getElementById('integralesI__function-input');

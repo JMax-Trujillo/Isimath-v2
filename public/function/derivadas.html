@@ -1,11 +1,883 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>ISIMath - Calculadora de Derivadas</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.11.0/math.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/2.26.0/plotly.min.js"></script>
+    <script src="https://unpkg.com/mathlive" defer></script>
+    <link rel="stylesheet" href="https://unpkg.com/mathlive@0.95.0/dist/mathlive-static.css">
+    <style>
+        /* --- Variables de Color y Estilos Base --- */
+        :root {
+            --integralesI-bg-light: #FFFFFF; /* Blanco para modo día */
+            --integralesI-bg-dark: #0A192F; /* Azul noche profundo para modo noche */
+            --integralesI-surface-light: #F8FAFC; /* Blanco roto para superficies en modo día */
+            --integralesI-surface-dark: #172A45; /* Azul oscuro para superficies en modo noche */
+            --integralesI-primary-light: #2563EB; /* Azul primario vibrante para modo día */
+            --integralesI-primary-dark: #60A5FA; /* Azul primario más claro para modo noche */
+            --integralesI-secondary-light: #06B6D4; /* Celeste secundario para modo día */
+            --integralesI-secondary-dark: #22D3EE; /* Celeste secundario más claro para modo noche */
+            --integralesI-text-light: #1E293B; /* Azul oscuro para texto en modo día */
+            --integralesI-text-dark: #FFFFFF; /* Blanco puro para texto en modo noche */
+            --integralesI-text-muted-light: #64748B; /* Gris medio para texto muted en modo día */
+            --integralesI-text-muted-dark: #F0F2F5; /* Blanco muy claro para texto muted en modo noche */
+            --integralesI-border-light: #E2E8F0; /* Gris muy claro para bordes en modo día */
+            --integralesI-border-dark: #334155; /* Gris oscuro para bordes en modo noche */
+            --integralesI-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --integralesI-shadow-dark: 0 4px 15px rgba(0, 0, 0, 0.2);
+            --integralesI-success-light: #10B981; /* Verde éxito */
+            --integralesI-success-dark: #34D399; /* Verde éxito */
+            --integralesI-error-light: #EF4444; /* Rojo error */
+            --integralesI-error-dark: #F87171; /* Rojo error */
+        }
+
+        body {
+            margin: 0;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            background-color: var(--integralesI-bg-light);
+            color: var(--integralesI-text-light);
+            transition: background-color 0.3s ease, color 0.3s ease;
+            min-height: 100vh;
+        }
+
+        body.dark {
+            background-color: var(--integralesI-bg-dark);
+            color: var(--integralesI-text-dark); /* Asegura que el color de texto base sea blanco */
+        }
+
+        /* Contenedor principal */
+        .integralesI__main-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            padding: 1.5rem;
+            max-width: 1400px;
+            margin: 2rem auto;
+            background-color: var(--integralesI-surface-light);
+            border-radius: 12px;
+            box-shadow: var(--integralesI-shadow);
+            border: 1px solid var(--integralesI-border-light);
+        }
+
+        body.dark .integralesI__main-container {
+            background-color: var(--integralesI-surface-dark);
+            border: 1px solid var(--integralesI-border-dark);
+            box-shadow: var(--integralesI-shadow-dark);
+        }
+
+        /* Botón de tema */
+        .integralesI__theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: var(--integralesI-primary-light);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            box-shadow: var(--integralesI-shadow);
+        }
+
+        body.dark .integralesI__theme-toggle {
+            background-color: var(--integralesI-primary-dark);
+        }
+
+        .integralesI__theme-toggle:hover {
+            transform: scale(1.1);
+        }
+
+        /* Sección de inputs */
+        .integralesI__input-section {
+            padding: 1.5rem;
+            background-color: var(--integralesI-bg-light);
+            border-radius: 8px;
+            border: 1px solid var(--integralesI-border-light);
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        body.dark .integralesI__input-section {
+            background-color: var(--integralesI-bg-dark);
+            border: 1px solid var(--integralesI-border-dark);
+            box-shadow: inset 0 1px 3px rgba(255,255,255,0.05);
+        }
+
+        .integralesI__input-section h3 {
+            color: var(--integralesI-primary-light);
+            margin-top: 0;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+
+        body.dark .integralesI__input-section h3 {
+            color: var(--integralesI-primary-dark);
+        }
+
+        .integralesI__form-group {
+            margin-bottom: 1rem;
+        }
+
+        .integralesI__form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--integralesI-text-light);
+        }
+
+        body.dark .integralesI__form-group label {
+            color: var(--integralesI-text-dark);
+        }
+
+        .integralesI__math-input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid var(--integralesI-border-light);
+            border-radius: 6px;
+            font-size: 1rem;
+            background-color: var(--integralesI-surface-light);
+            color: var(--integralesI-text-light); /* Color del texto del input en modo día */
+            transition: border-color 0.2s, box-shadow 0.2s;
+            min-height: 40px;
+        }
+
+        body.dark .integralesI__math-input {
+            background-color: var(--integralesI-surface-dark);
+            border: 2px solid var(--integralesI-border-dark);
+        }
+        /* Asegura que el texto dentro de math-field sea blanco en modo oscuro */
+        body.dark math-field {
+            color: var(--integralesI-text-dark); /* Blanco puro */
+        }
+
+
+        .integralesI__math-input:focus-within {
+            border-color: var(--integralesI-primary-light);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2); /* Sombra azul */
+        }
+
+        body.dark .integralesI__math-input:focus-within {
+            border-color: var(--integralesI-primary-dark);
+            box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.2); /* Sombra azul */
+        }
+
+        .integralesI__button {
+            background-color: var(--integralesI-primary-light);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-top: 1rem;
+            font-size: 1rem;
+            display: block; /* Make buttons block level */
+            width: fit-content; /* Adjust width to content */
+        }
+
+        body.dark .integralesI__button {
+            background-color: var(--integralesI-primary-dark);
+        }
+
+        .integralesI__button:hover {
+            background-color: #1D4ED8; /* Tono más oscuro de azul */
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(37, 99, 235, 0.3);
+        }
+
+        body.dark .integralesI__button:hover {
+            background-color: #3B82F6; /* Tono más oscuro de azul */
+        }
+
+        .integralesI__button:active {
+            transform: translateY(0);
+        }
+
+        /* Secondary button style */
+        .integralesI__secondary-button {
+            background-color: var(--integralesI-secondary-light);
+        }
+
+        body.dark .integralesI__secondary-button {
+            background-color: var(--integralesI-secondary-dark);
+        }
+
+        .integralesI__secondary-button:hover {
+            background-color: #0369A1; /* Darker shade of secondary-light */
+            box-shadow: 0 4px 8px rgba(6, 182, 212, 0.3);
+        }
+
+        body.dark .integralesI__secondary-button:hover {
+            background-color: #0EA5E9; /* Darker shade of secondary-dark */
+        }
+
+        /* Sección de outputs */
+        .integralesI__output-section {
+            padding: 1.5rem;
+            background-color: var(--integralesI-bg-light);
+            border-radius: 8px;
+            border: 1px solid var(--integralesI-border-light);
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        body.dark .integralesI__output-section {
+            background-color: var(--integralesI-bg-dark);
+            border: 1px solid var(--integralesI-border-dark);
+            box-shadow: inset 0 1px 3px rgba(255,255,255,0.05);
+        }
+
+        .integralesI__output-section h3 {
+            color: var(--integralesI-primary-light);
+            margin-top: 0;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+
+        body.dark .integralesI__output-section h3 {
+            color: var(--integralesI-primary-dark);
+        }
+
+        /* Área de resultados */
+        .integralesI__result-display {
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            background-color: var(--integralesI-surface-light);
+            border-radius: 8px;
+            border: 1px solid var(--integralesI-border-light);
+            min-height: 50px;
+            font-size: 1.1rem;
+            color: var(--integralesI-text-light); /* Color del texto en modo día */
+        }
+
+        body.dark .integralesI__result-display {
+            background-color: var(--integralesI-surface-dark);
+            border: 1px solid var(--integralesI-border-dark);
+            color: var(--integralesI-text-dark); /* Color del texto en modo noche */
+        }
+
+        .integralesI__result-display.hidden {
+            display: none;
+        }
+
+        .integralesI__result-display h4 {
+            color: var(--integralesI-primary-light);
+            margin-top: 0;
+            margin-bottom: 0.5rem;
+        }
+
+        body.dark .integralesI__result-display h4 {
+            color: var(--integralesI-primary-dark);
+        }
+
+        .integralesI__result-note {
+            font-size: 0.9rem;
+            color: var(--integralesI-text-muted-light);
+            margin-top: 1rem;
+        }
+
+        body.dark .integralesI__result-note {
+            color: var(--integralesI-text-muted-dark);
+        }
+
+        /* Contenedor de pasos */
+        .integralesI__steps-container {
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            background-color: var(--integralesI-surface-light);
+            border-radius: 8px;
+            border: 1px solid var(--integralesI-border-light);
+        }
+
+        body.dark .integralesI__steps-container {
+            background-color: var(--integralesI-surface-dark);
+            border: 1px solid var(--integralesI-border-dark);
+        }
+
+        .integralesI__steps-container.hidden {
+            display: none;
+        }
+
+        .integralesI__steps-container h4 {
+            color: var(--integralesI-primary-light);
+            margin-top: 0;
+            margin-bottom: 1rem;
+        }
+
+        body.dark .integralesI__steps-container h4 {
+            color: var(--integralesI-primary-dark);
+        }
+
+        .integralesI__steps-content {
+            background: var(--integralesI-bg-light);
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid var(--integralesI-primary-light);
+            margin-top: 10px;
+        }
+
+        body.dark .integralesI__steps-content {
+            background: var(--integralesI-bg-dark);
+            border-left-color: var(--integralesI-primary-dark);
+        }
+
+        .integralesI__steps-content.hidden {
+            display: none;
+        }
+
+        .integralesI__step-item {
+            margin-bottom: 15px;
+            padding: 10px;
+            background-color: var(--integralesI-surface-light);
+            border-radius: 6px;
+            border: 1px solid var(--integralesI-border-light);
+        }
+
+        body.dark .integralesI__step-item {
+            background-color: var(--integralesI-surface-dark);
+            border: 1px solid var(--integralesI-border-dark);
+        }
+
+        .integralesI__step-title {
+            font-weight: bold;
+            color: var(--integralesI-primary-light);
+            margin-bottom: 5px;
+        }
+
+        body.dark .integralesI__step-title {
+            color: var(--integralesI-primary-dark);
+        }
+
+        .integralesI__step-rule {
+            font-size: 0.9em;
+            color: var(--integralesI-text-muted-light);
+            font-style: italic;
+            margin-top: 5px;
+        }
+
+        body.dark .integralesI__step-rule {
+            color: var(--integralesI-text-muted-dark);
+        }
+
+        /* Gráfica */
+        .integralesI__graph-container {
+            width: 100%;
+            height: 400px;
+            background-color: var(--integralesI-surface-light);
+            border-radius: 8px;
+            border: 1px solid var(--integralesI-border-light);
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+
+        body.dark .integralesI__graph-container {
+            background-color: var(--integralesI-surface-dark);
+            border: 1px solid var(--integralesI-border-dark);
+        }
+
+        /* Mensajes de error */
+        .integralesI__error-message {
+            color: var(--integralesI-error-light);
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+            padding: 0.5rem;
+            background-color: rgba(220, 53, 69, 0.1);
+            border-radius: 4px;
+            border: 1px solid rgba(220, 53, 69, 0.3);
+        }
+
+        body.dark .integralesI__error-message {
+            color: var(--integralesI-error-dark);
+            background-color: rgba(248, 81, 73, 0.1);
+            border-color: rgba(248, 81, 73, 0.3);
+        }
+
+        .integralesI__error-message.hidden {
+            display: none;
+        }
+
+        /* Responsive */
+        @media (min-width: 768px) {
+            .integralesI__main-container {
+                flex-direction: row;
+                gap: 2rem;
+            }
+            
+            .integralesI__input-section {
+                flex: 1;
+                max-width: 400px;
+            }
+            
+            .integralesI__output-section {
+                flex: 2;
+            }
+        }
+
+        /* Estilos específicos para math-field */
+        math-field {
+            font-size: 1.1rem;
+            border: none;
+            padding: 0;
+            background: transparent;
+        }
+        /* Asegura que el texto dentro de math-field sea blanco en modo oscuro */
+        body.dark math-field {
+            color: var(--integralesI-text-dark); /* Blanco puro */
+        }
+
+
+        math-field:focus {
+            outline: none;
+        }
+
+        /* Leyenda de la gráfica */
+        .integralesI__graph-legend {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: var(--integralesI-surface-light);
+            border-radius: 6px;
+            border: 1px solid var(--integralesI-border-light);
+            font-size: 0.9rem;
+        }
+
+        body.dark .integralesI__graph-legend {
+            background-color: var(--integralesI-surface-dark);
+            border: 1px solid var(--integralesI-border-dark);
+        }
+
+        .integralesI__legend-item {
+            display: inline-block;
+            margin-right: 20px;
+            font-weight: bold;
+        }
+
+        .integralesI__legend-original {
+            color: var(--integralesI-secondary-light);
+        }
+
+        body.dark .integralesI__legend-original {
+            color: var(--integralesI-secondary-dark); /* Color secundario celeste para modo oscuro */
+        }
+
+        .integralesI__legend-derivative { /* Cambiado de integral a derivative */
+            color: var(--integralesI-primary-light);
+        }
+
+        body.dark .integralesI__legend-derivative { /* Cambiado de integral a derivative */
+            color: var(--integralesI-primary-dark); /* Color primario azul para modo oscuro */
+        }
+        .app__hidden {
+            display: none;
+        }
+    </style>
 </head>
 <body>
-    
+    <button id="integralesI__theme-toggle" class="integralesI__theme-toggle app__hidden">
+        🌙
+    </button>
+
+    <div class="integralesI__main-container">
+        <div class="integralesI__input-section">
+            <h3>Calcular Derivada</h3>
+            <div class="integralesI__form-group">
+                <label for="integralesI__function-input">Función f(x):</label>
+                <div class="integralesI__math-input">
+                    <math-field id="integralesI__function-input" virtual-keyboard-mode="auto">x^2</math-field>
+                </div>
+                <div id="integralesI__function-error" class="integralesI__error-message hidden"></div>
+            </div>
+            <button id="integralesI__solve-btn" class="integralesI__button">Calcular Derivada</button>
+            <button id="integralesI__clear-btn" class="integralesI__button integralesI__secondary-button" style="margin-top: 10px;">LIMPIAR</button>
+            <button id="integralesI__theory-btn" class="integralesI__button integralesI__secondary-button" style="margin-top: 10px;">IR A LA TEORÍA</button>
+        </div>
+
+        <div class="integralesI__output-section">
+            <h3>Resultado y Visualización</h3>
+            
+            <div id="integralesI__graph-container" class="integralesI__graph-container">
+                <div id="integralesI__plot" style="width: 100%; height: 100%;"></div>
+            </div>
+            
+            <div id="integralesI__graph-legend" class="integralesI__graph-legend">
+                <span class="integralesI__legend-item integralesI__legend-original">━━━ f(x) (función original)</span>
+                <span class="integralesI__legend-item integralesI__legend-derivative">━━━ f'(x) (derivada)</span>
+            </div>
+
+            <div id="integralesI__result" class="integralesI__result-display hidden">
+                <h4>Resultado:</h4>
+                <p>La derivada de la función es:</p>
+                <div id="integralesI__result-math-field" style="font-size: 1.2rem; margin: 1rem 0;"></div>
+            </div>
+
+            <div id="integralesI__steps-container" class="integralesI__steps-container hidden">
+                <h4>Pasos de resolución:</h4>
+                <button id="integralesI__toggle-steps-btn" class="integralesI__button">
+                    Mostrar pasos detallados
+                </button>
+                <div id="integralesI__steps-content" class="integralesI__steps-content hidden">
+                    <div id="integralesI__steps-list"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script>
+
+    const darkMode = localStorage.getItem("theme");
+
+if (darkMode === "dark") {
+    // Aplica clase al body para activar modo oscuro
+    document.body.classList.add("dark");
+}
+        document.addEventListener('DOMContentLoaded', () => {
+            // Referencias a elementos del DOM
+            const integralesI__functionInput = document.getElementById('integralesI__function-input');
+            const integralesI__solveBtn = document.getElementById('integralesI__solve-btn');
+            const integralesI__clearBtn = document.getElementById('integralesI__clear-btn');
+            const integralesI__theoryBtn = document.getElementById('integralesI__theory-btn'); // Nuevo botón
+            const integralesI__resultDiv = document.getElementById('integralesI__result');
+            const integralesI__resultMathField = document.getElementById('integralesI__result-math-field');
+            const integralesI__functionError = document.getElementById('integralesI__function-error');
+            const integralesI__stepsContainer = document.getElementById('integralesI__steps-container');
+            const integralesI__toggleStepsBtn = document.getElementById('integralesI__toggle-steps-btn');
+            const integralesI__stepsContent = document.getElementById('integralesI__steps-content');
+            const integralesI__stepsList = document.getElementById('integralesI__steps-list');
+            const integralesI__graphContainer = document.getElementById('integralesI__graph-container');
+            const integralesI__graphLegend = document.getElementById('integralesI__graph-legend');
+            const integralesI__themeToggle = document.getElementById('integralesI__theme-toggle');
+
+
+
+            // Variables para almacenar las funciones y pasos
+            let originalFunction = null; // Renamed for clarity
+            let derivativeFunction = null; // Renamed for clarity
+            let derivativeSteps = []; // Renamed for clarity
+
+            // Manejo del tema
+            integralesI__themeToggle.addEventListener('click', () => {
+                document.body.classList.toggle('dark');
+                integralesI__themeToggle.textContent = document.body.classList.contains('dark') ? '☀️' : '🌙';
+                
+                // Actualizar gráfica si existe, o redibujar el lienzo vacío
+                if (originalFunction && derivativeFunction) {
+                    drawGraph(originalFunction, derivativeFunction);
+                } else {
+                    drawGraph(math.compile('0'), math.compile('0')); // Draw empty graph
+                }
+            });
+
+            // Manejar el toggle de pasos
+            integralesI__toggleStepsBtn.addEventListener('click', () => {
+                if (integralesI__stepsContent.classList.contains('hidden')) {
+                    integralesI__stepsContent.classList.remove('hidden');
+                    integralesI__toggleStepsBtn.textContent = 'Ocultar pasos detallados';
+                } else {
+                    integralesI__stepsContent.classList.add('hidden');
+                    integralesI__toggleStepsBtn.textContent = 'Mostrar pasos detallados';
+                }
+            });
+
+            // Función para normalizar la entrada
+            const normalizeInput = (input) => {
+                return input
+                    .replace(/\\cdot/g, '*')
+                    .replace(/\\left\(/g, '(')
+                    .replace(/\\right\)/g, ')')
+                    .replace(/\\sin/g, 'sin')
+                    .replace(/\\cos/g, 'cos')
+                    .replace(/\\tan/g, 'tan')
+                    .replace(/\\sec/g, 'sec')
+                    .replace(/\\csc/g, 'csc')
+                    .replace(/\\cot/g, 'cot')
+                    .replace(/\\ln/g, 'log')
+                    .replace(/\\exp/g, 'exp')
+                    .replace(/\\sqrt{([^}]+)}/g, 'sqrt($1)')
+                    .replace(/\\frac{([^}]+)}{([^}]+)}/g, '($1)/($2)')
+                    .replace(/\\ /g, '')
+                    .replace(/\s+/g, '');
+            };
+
+            // Función para agregar pasos de derivada
+            const addDerivativeStep = (description, formula, rule) => {
+                derivativeSteps.push({
+                    description: description,
+                    formula: formula,
+                    rule: rule
+                });
+            };
+
+            // Función para mostrar pasos de derivada
+            const displayDerivativeSteps = () => {
+                integralesI__stepsList.innerHTML = '';
+                derivativeSteps.forEach((step, index) => {
+                    const stepDiv = document.createElement('div');
+                    stepDiv.className = 'integralesI__step-item';
+                    stepDiv.innerHTML = `
+                        <div class="integralesI__step-title">
+                            Paso ${index + 1}: ${step.description}
+                        </div>
+                        <div style="margin: 10px 0;">
+                            <math-field read-only>${step.formula}</math-field>
+                        </div>
+                        <div class="integralesI__step-rule">
+                            Regla aplicada: ${step.rule}
+                        </div>
+                    `;
+                    integralesI__stepsList.appendChild(stepDiv);
+                });
+            };
+
+            // Función para dibujar la gráfica (adaptada para derivadas)
+            const drawGraph = (originalFunc, derivativeFunc) => {
+                const xMin = -5;
+                const xMax = 5;
+                const numPoints = 500;
+                const step = (xMax - xMin) / numPoints;
+                
+                const xValues = [];
+                const yOriginal = [];
+                const yDerivative = []; // Changed from yIntegral
+                
+                for (let i = 0; i <= numPoints; i++) {
+                    const x = xMin + i * step;
+                    xValues.push(x);
+                    
+                    try {
+                        const y = originalFunc.evaluate({x: x});
+                        yOriginal.push(isFinite(y) && Math.abs(y) < 100 ? y : null);
+                    } catch (e) {
+                        yOriginal.push(null);
+                    }
+                    
+                    try {
+                        const der = derivativeFunc.evaluate({x: x}); // Changed from integral
+                        yDerivative.push(isFinite(der) && Math.abs(der) < 100 ? der : null);
+                    } catch (e) {
+                        yDerivative.push(null);
+                    }
+                }
+                
+                const isDarkMode = document.body.classList.contains('dark');
+                const bgColor = isDarkMode ? '#172A45' : '#FFFFFF'; /* Usar surface-dark para el fondo del plot en modo oscuro */
+                const gridColor = isDarkMode ? '#334155' : '#E2E8F0';
+                const textColor = isDarkMode ? '#FFFFFF' : '#1E293B'; /* Texto de la gráfica blanco en modo oscuro */
+                
+                const data = [
+                    {
+                        x: xValues,
+                        y: yOriginal,
+                        type: 'scatter',
+                        mode: 'lines',
+                        name: 'f(x) (función original)',
+                        line: {
+                            color: isDarkMode ? '#0F172A' : '#06B6D4', /* Azul noche para original en dark mode, celeste en light */
+                            width: 2
+                        },
+                        connectgaps: false
+                    },
+                    {
+                        x: xValues,
+                        y: yDerivative, // Changed from yIntegral
+                        type: 'scatter',
+                        mode: 'lines',
+                        name: 'f\'(x) (derivada)', // Changed name
+                        line: {
+                            color: isDarkMode ? '#0A192F' : '#2563EB', /* Azul noche más oscuro para derivada en dark mode, azul primario en light */
+                            width: 2
+                        },
+                        connectgaps: false
+                    }
+                ];
+                
+                const layout = {
+                    title: {
+                        text: 'Función Original y Derivada', // Changed title
+                        font: {
+                            size: 16,
+                            color: textColor
+                        }
+                    },
+                    xaxis: {
+                        title: 'x',
+                        zeroline: true,
+                        zerolinecolor: textColor,
+                        zerolinewidth: 1,
+                        gridcolor: gridColor,
+                        gridwidth: 0.5,
+                        color: textColor
+                    },
+                    yaxis: {
+                        title: 'y',
+                        zeroline: true,
+                        zerolinecolor: textColor,
+                        zerolinewidth: 1,
+                        gridcolor: gridColor,
+                        gridwidth: 0.5,
+                        color: textColor
+                    },
+                    plot_bgcolor: bgColor,
+                    paper_bgcolor: bgColor,
+                    font: {
+                        family: 'Arial, sans-serif',
+                        size: 12,
+                        color: textColor
+                    },
+                    legend: {
+                        x: 0.02,
+                        y: 0.98,
+                        bgcolor: isDarkMode ? 'rgba(23,42,69,0.8)' : 'rgba(255,255,255,0.8)', /* Usar surface-dark con transparencia */
+                        bordercolor: isDarkMode ? '#334155' : '#E2E8F0',
+                        borderwidth: 1,
+                        font: {
+                            color: textColor
+                        }
+                    },
+                    margin: {
+                        l: 50,
+                        r: 50,
+                        t: 50,
+                        b: 50
+                    }
+                };
+                
+                // Configurar opciones
+                const config = {
+                    responsive: true,
+                    displayModeBar: true,
+                    displaylogo: false,
+                    modeBarButtonsToRemove: ['pan2d', 'lasso2d', 'select2d', 'autoScale2d', 'toggleSpikelines', 'hoverClosestCartesian', 'hoverCompareCartesian']
+                };
+                
+                // Crear la gráfica
+                Plotly.newPlot('integralesI__plot', data, layout, config);
+            };
+
+            // Función principal para calcular derivada
+            const calculateDerivative = (funcText) => { // Renamed function
+                integralesI__resultDiv.classList.add('hidden');
+                integralesI__functionError.classList.add('hidden');
+                integralesI__functionError.textContent = '';
+                integralesI__stepsContainer.classList.add('hidden');
+                derivativeSteps = []; // Limpiar pasos anteriores
+
+                try {
+                    const cleanInput = normalizeInput(funcText);
+                    const node = math.parse(cleanInput);
+                    
+                    // Compilar la función original
+                    originalFunction = math.compile(cleanInput);
+                    
+                    // Add initial step
+                    addDerivativeStep(
+                        "Función original a derivar",
+                        `${node.toTex()}`,
+                        "Identificación de la función"
+                    );
+
+                    // Calculate derivative using math.derivative
+                    const derivativeNode = math.derivative(node, 'x');
+                    const simplifiedDerivativeNode = math.simplify(derivativeNode);
+
+                    // Add step for derivative calculation
+                    addDerivativeStep(
+                        "Aplicación de reglas de derivación",
+                        `\\frac{d}{dx} (${node.toTex()}) = ${simplifiedDerivativeNode.toTex()}`,
+                        "Aplicación de reglas de derivación (cadena, producto, etc.)"
+                    );
+                    
+                    // Compilar la función derivada
+                    derivativeFunction = math.compile(simplifiedDerivativeNode.toString());
+                    
+                    const derivativeLatex = simplifiedDerivativeNode.toTex({
+                        handler: (node, options) => {
+                            if (node.type === 'FunctionNode' && (node.fn.name === 'log' || node.fn.name === 'ln')) {
+                                return `\\ln\\left(${node.args[0].toTex(options)}\\right)`;
+                            }
+                            return undefined;
+                        }
+                    });
+
+                    // Dibujar la gráfica con Plotly
+                    drawGraph(originalFunction, derivativeFunction);
+
+                    integralesI__resultMathField.innerHTML = `<math-field read-only>${derivativeLatex}</math-field>`;
+                    integralesI__resultDiv.classList.remove('hidden');
+                    
+                    // Mostrar pasos
+                    integralesI__stepsContainer.classList.remove('hidden');
+                    displayDerivativeSteps();
+                    
+                } catch (error) {
+                    if (!error.message.includes('render is not a function')) {
+                        integralesI__functionError.textContent = 'Error al procesar la función. Asegúrate de que la sintaxis es correcta. Mensaje: ' + error.message;
+                        integralesI__functionError.classList.remove('hidden');
+                    }
+                    console.error("Error al calcular la derivada:", error);
+                }
+            };
+
+            // Event listener para el botón de resolver (ahora calcular derivada)
+            integralesI__solveBtn.addEventListener('click', () => {
+                const functionText = integralesI__functionInput.getValue();
+                integralesI__resultDiv.classList.add('hidden');
+                integralesI__functionError.classList.add('hidden');
+                integralesI__functionError.textContent = '';
+                integralesI__stepsContainer.classList.add('hidden');
+
+
+                if (!functionText) {
+                    integralesI__functionError.textContent = 'Por favor, introduce una función para derivar.';
+                    integralesI__functionError.classList.remove('hidden');
+                    return;
+                }
+
+                calculateDerivative(functionText);
+            });
+
+            // Event listener para el botón de limpiar
+            integralesI__clearBtn.addEventListener('click', () => {
+                // Clear input
+                integralesI__functionInput.setValue(''); // Clear the math-field input
+
+                // Hide all output sections and clear their content
+                integralesI__resultDiv.classList.add('hidden');
+                integralesI__resultMathField.innerHTML = ''; // Clear result math field
+                integralesI__functionError.classList.add('hidden');
+                integralesI__functionError.textContent = ''; // Clear error message
+                integralesI__stepsContainer.classList.add('hidden');
+                integralesI__stepsContent.classList.add('hidden'); // Ensure steps content is also hidden
+
+                // Reset steps related elements
+                derivativeSteps = [];
+                integralesI__stepsList.innerHTML = ''; // Clear steps list
+                integralesI__toggleStepsBtn.textContent = 'Mostrar pasos detallados';
+
+                // Clear Plotly graph and redraw it empty
+                const plotDiv = document.getElementById('integralesI__plot');
+                if (plotDiv) {
+                    Plotly.purge(plotDiv); // Clears the graph
+                }
+                drawGraph(math.compile('0'), math.compile('0')); // Draw f(x)=0 and derivative=0
+
+                // Reset function variables
+                originalFunction = null;
+                derivativeFunction = null;
+            });
+
+            // Event listener para el nuevo botón "IR A LA TEORIA"
+            integralesI__theoryBtn.addEventListener('click', () => {
+                console.log('Botón "IR A LA TEORIA" clickeado. Aquí iría la lógica para mostrar la teoría de derivadas.');
+                alert('¡Has hecho clic en "IR A LA TEORÍA"! Aquí podrías redirigir a una página con contenido teórico sobre derivadas.');
+            });
+
+            // Draw initial empty graph on page load
+            drawGraph(math.compile('0'), math.compile('0')); // Draw f(x)=0 and derivative=0
+        });
+    </script>
 </body>
 </html>
