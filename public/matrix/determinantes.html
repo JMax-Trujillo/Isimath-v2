@@ -59,40 +59,16 @@
             padding: 1rem;
         }
         
-        .header-section {
-            background: linear-gradient(135deg, var(--navy-blue) 0%, #172554 100%);
-            padding: 3rem 2rem;
-            color: white;
-            position: relative;
-            overflow: hidden;
-            border-bottom: 1px solid rgba(59, 130, 246, 0.2);
-        }
-        
-        .header-section::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: radial-gradient(circle at 20% 50%, rgba(59, 130, 246, 0.1) 0%, transparent 70%);
-            z-index: 0;
-        }
-        
-        .header-content {
-            position: relative;
-            z-index: 1;
-        }
-        
+        /* Modified main-grid for responsive layout */
         .main-grid {
             display: grid;
-            grid-template-columns: 1fr;
+            grid-template-columns: 1fr; /* Single column for mobile */
             gap: 1.5rem;
         }
         
         @media (min-width: 1024px) {
             .main-grid {
-                grid-template-columns: 2fr 1fr;
+                grid-template-columns: 1fr 1fr; /* Two columns for desktop */
             }
         }
         
@@ -204,30 +180,15 @@
     </style>
 </head>
 <body>
-    <!-- Header Section -->
-    <div class="header-section">
-        <div class="header-content content-container">
-            <h1 class="text-4xl md:text-5xl font-bold font-poppins mb-4 title-accent">CALCULADORA DE DETERMINANTES</h1>
-            <div class="max-w-3xl bg-white/5 p-6 rounded-xl border border-white/10 backdrop-blur-sm">
-                <p class="text-lg text-white/90 leading-relaxed">
-                    Calcula el determinante de una matriz cuadrada utilizando el método de Sarrus (para 3x3) o la expansión por cofactores.
-                </p>
-                <div class="mt-4 flex items-center text-white/80">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1 text-electric-blue" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2h-1V9z" clip-rule="evenodd" />
-                    </svg>
-                    <span class="text-sm font-medium">Herramienta interactiva de álgebra lineal</span>
-                </div>
-            </div>
-        </div>
-    </div>
-    
     <!-- Main Content -->
     <div class="content-container py-8">
+        <!-- Title moved here -->
+        <h1 class="text-4xl md:text-5xl font-bold font-poppins mb-8 text-center title-accent">CALCULADORA DE DETERMINANTES</h1>
+
         <div class="main-grid">
-            <!-- Left Column - Matrix Inputs and Operations -->
+            <!-- Left Column: Input and Controls -->
             <div>
-                <section class="mb-12 content-card shadow-sm p-6">
+                <section class="mb-6 content-card shadow-sm p-6">
                     <h2 class="text-2xl font-bold font-poppins text-primary mb-6 flex items-center">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2 text-electric-blue" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
@@ -260,19 +221,24 @@
 
                     <!-- Message Box for Errors/Info -->
                     <div id="messageBox" class="message-box"></div>
-
-                    <!-- Result Display -->
-                    <div class="bg-dark-gray rounded-xl overflow-hidden border border-medium-gray p-6">
-                        <h3 class="text-xl font-semibold text-primary mb-4">Resultado del Determinante</h3>
-                        <div id="resultDeterminantDisplay" class="result-display-area text-center">
-                            <p class="text-light-gray text-base font-normal">El determinante aparecerá aquí.</p>
-                        </div>
-                    </div>
                 </section>
             </div>
             
-            <!-- Right Column - Formulas -->
+            <!-- Right Column: Result Display -->
             <div>
+                <section class="mb-8 content-card shadow-sm p-6">
+                    <h2 class="text-2xl font-bold font-poppins text-primary mb-6 flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2 text-electric-blue" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                        </svg>
+                        <span class="title-accent">Resultado del Determinante</span>
+                    </h2>
+                    <div id="resultDeterminantDisplay" class="result-display-area text-center">
+                        <p class="text-light-gray text-base font-normal">El determinante aparecerá aquí.</p>
+                    </div>
+                </section>
+
+                <!-- Formulas Section (moved here for single column layout) -->
                 <section class="mb-8 content-card shadow-sm p-6">
                     <h2 class="text-2xl font-bold font-poppins text-primary mb-6 flex items-center">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2 text-electric-blue" fill="none" viewBox="0 0 24 24" stroke="currentColor">

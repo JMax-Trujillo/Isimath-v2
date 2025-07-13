@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Métodos Iterativos para Sistemas de Ecuaciones - ISIMath</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            /* Light theme colors */
+            --light-bg: #f8fafc;
+            --light-surface: #ffffff;
+            --light-surface-alt: #f1f5f9;
+            --light-text-primary: #1e293b;
+            --light-text-secondary: #475569;
+            --light-border: #e2e8f0;
+            --light-shadow: rgba(0, 0, 0, 0.1);
+            
+            /* Dark theme colors */
+            --dark-bg: #0f172a;
+            --dark-surface: #1e293b;
+            --dark-surface-alt: #334155;
+            --dark-text-primary: #f8fafc;
+            --dark-text-secondary: #94a3b8;
+            --dark-border: #334155;
+            --dark-shadow: rgba(2, 6, 23, 0.3);
+            
+            /* Accent colors (consistent across themes) */
+            --midnight-blue: #0f172a;
+            --deep-blue: #1e293b;
+            --navy-blue: #1e3a8a;
+            --electric-blue: #3b82f6;
+            --light-blue: #60a5fa;
+            --pale-blue: #bfdbfe;
+            
+            /* Default to light theme */
+            --bg-primary: var(--light-bg);
+            --bg-surface: var(--light-surface);
+            --bg-surface-alt: var(--light-surface-alt);
+            --text-primary: var(--light-text-primary);
+            --text-secondary: var(--light-text-secondary);
+            --border-color: var(--light-border);
+            --shadow-color: var(--light-shadow);
+        }
+        
+        /* Dark theme */
+        .dark {
+            --bg-primary: var(--dark-bg);
+            --bg-surface: var(--dark-surface);
+            --bg-surface-alt: var(--dark-surface-alt);
+            --text-primary: var(--dark-text-primary);
+            --text-secondary: var(--dark-text-secondary);
+            --border-color: var(--dark-border);
+            --shadow-color: var(--dark-shadow);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        
+        .math-display {
+            font-size: 1.1rem;
+            overflow-x: auto;
+            overflow-y: hidden;
+            color: var(--pale-blue); /* Adjusted for dark theme readability */
+        }
+        
+        .formula-card {
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px var(--shadow-color);
+            overflow: hidden;
+            background-color: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: 0.75rem;
+        }
+        
+        .formula-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 12px var(--shadow-color);
+            border-color: var(--electric-blue);
+        }
+        
+        .content-container {
+            max-width: 95%;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+        
+        /* Main grid for responsive layout */
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr; /* Single column for mobile */
+            gap: 1.5rem;
+        }
+        
+        @media (min-width: 1024px) {
+            .main-grid {
+                grid-template-columns: 1fr 1fr; /* Two columns for desktop */
+            }
+        }
+        
+        .content-card {
+            background-color: var(--bg-surface);
+            box-shadow: 0 2px 4px var(--shadow-color);
+            border: 1px solid var(--border-color);
+            border-radius: 0.75rem;
+        }
+        
+        .title-accent {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .title-accent::after {
+            content: "";
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            width: 50%;
+            height: 3px;
+            background: linear-gradient(90deg, var(--electric-blue), transparent);
+            border-radius: 3px;
+        }
+        
+        .text-primary {
+            color: var(--text-primary);
+        }
+        
+        .text-secondary {
+            color: var(--text-secondary);
+        }
+        
+        .bg-light {
+            background-color: var(--bg-surface-alt);
+            border: 1px solid var(--border-color);
+        }
+        
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: var(--bg-primary);
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--electric-blue);
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--light-blue);
+        }
+        
+        input[type="number"] {
+            -moz-appearance: textfield;
+        }
+        input[type="number"]::-webkit-outer-spin-button,
+        input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        .matrix-input-grid, .vector-input-grid {
+            display: grid;
+            gap: 0.5rem;
+        }
+
+        .matrix-input-grid input, .vector-input-grid input {
+            width: 100%;
+            padding: 0.5rem;
+            background-color: var(--bg-surface-alt); /* Use surface-alt for inputs */
+            border: 1px solid var(--border-color);
+            border-radius: 0.25rem;
+            color: var(--text-primary);
+            text-align: center;
+        }
+
+        .result-display-area {
+            min-height: 100px;
+            background-color: var(--bg-surface-alt);
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            overflow-x: auto;
+        }
+        .result-display-area .math-display {
+            font-size: 1.5rem; /* Larger for results */
+            color: var(--electric-blue);
+            margin-bottom: 0.5rem;
+        }
+        .result-display-area p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .message-box {
+            background-color: var(--navy-blue);
+            color: var(--white);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-top: 1rem;
+            display: none; /* Hidden by default */
+            border: 1px solid var(--electric-blue);
+        }
+        .message-box.active {
+            display: block;
+        }
+
+        /* Styles for buttons */
+        .app-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            background: var(--electric-blue);
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .app-button::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+        
+        .app-button:hover::before {
+            left: 100%;
+        }
+        
+        .app-button:hover {
+            background: var(--light-blue);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(59, 130, 246, 0.3);
+        }
+
+        /* Theme Toggle */
+        .theme-toggle {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--bg-surface-alt);
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px var(--shadow-color);
+            position: absolute; /* Position it absolutely */
+            top: 2rem;
+            right: 2rem;
+            z-index: 10;
+        }
+        
+        .theme-toggle:hover {
+            background: var(--electric-blue);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 12px var(--shadow-color);
+        }
+        
+        .theme-toggle svg {
+            width: 1.25rem;
+            height: 1.25rem;
+            transition: all 0.3s ease;
+            color: var(--text-primary); /* Default icon color */
+        }
+
+        .theme-toggle:hover svg {
+            color: white; /* Icon color on hover */
+        }
+        
+        .theme-toggle span {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--text-primary); /* Default text color */
+        }
+
+        .theme-toggle:hover span {
+            color: white; /* Text color on hover */
+        }
+
+        /* Responsive adjustments for theme toggle */
+        @media (max-width: 768px) {
+            .theme-toggle {
+                position: static; /* Remove absolute positioning on mobile */
+                margin: 1rem auto; /* Center it */
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Theme Toggle -->
+    <div id="themeToggle" class="theme-toggle">
+        <svg id="sunIcon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+            <path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 00-.707-.293h-1.414a1 1 0 100 2h1.414a1 1 0 00.707-.293l.707-.707a1 1 0 00-.707-1.707zM17 10h-1a1 1 0 100 2h1a1 1 0 100-2zm-9.293 4.646a1 1 0 001.414 0l.707-.707a1 1 0 00-1.414-1.414l-.707.707a1 1 0 000 1.414zM3 10a1 1 0 011-1h1a1 1 0 110 2H4a1 1 0 01-1-1zm2.121-7.778l.707-.707A1 1 0 015.828 2.222L5.121 2.93a1 1 0 01-.707.293 1 1 0 01-.707-1.707z" />
+        </svg>
+        <svg id="moonIcon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 hidden" viewBox="0 0 20 20" fill="currentColor">
+            <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" />
+        </svg>
+        <span id="themeText">Modo Oscuro</span>
+    </div>
+
+    <!-- Main Content -->
+    <div class="content-container py-8 relative">
+        <!-- Title moved here -->
+        <h1 class="text-4xl md:text-5xl font-bold font-poppins mb-8 text-center title-accent">CALCULADORA DE MÉTODOS ITERATIVOS PARA SISTEMAS DE ECUACIONES</h1>
+        
+        <div class="main-grid">
+            <!-- Left Column: Input and Controls -->
+            <div>
+                <section class="mb-6 content-card shadow-sm p-6">
+                    <h2 class="text-2xl font-bold font-poppins text-primary mb-6 flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2 text-electric-blue" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                        </svg>
+                        <span class="title-accent">Definir Sistema de Ecuaciones</span>
+                    </h2>
+                    
+                    <!-- System Size Input -->
+                    <div class="bg-bg-surface-alt rounded-xl overflow-hidden border border-border-color p-6 mb-6">
+                        <h3 class="text-xl font-semibold text-primary mb-4">Tamaño del Sistema (n)</h3>
+                        <div class="flex items-center space-x-4 mb-4">
+                            <label for="systemSize" class="text-text-secondary">Número de Ecuaciones/Variables:</label>
+                            <input type="number" id="systemSize" value="3" min="2" max="5" class="w-20 p-2 rounded-md bg-bg-surface-alt text-text-primary border border-border-color" onchange="generateInputs()">
+                        </div>
+                    </div>
+
+                    <!-- Matrix A and Vector b Input -->
+                    <div class="bg-bg-surface-alt rounded-xl overflow-hidden border border-border-color p-6 mb-6">
+                        <h3 class="text-xl font-semibold text-primary mb-4">Matriz de Coeficientes A y Vector b</h3>
+                        <div id="matrixAInputsContainer" class="mb-4">
+                            <p class="text-text-secondary mb-2">Matriz A:</p>
+                            <div id="matrixAInputs" class="matrix-input-grid"></div>
+                        </div>
+                        <div id="vectorBInputsContainer">
+                            <p class="text-text-secondary mb-2">Vector b:</p>
+                            <div id="vectorBInputs" class="vector-input-grid"></div>
+                        </div>
+                    </div>
+
+                    <!-- Initial Guess and Iteration Parameters -->
+                    <div class="bg-bg-surface-alt rounded-xl overflow-hidden border border-border-color p-6 mb-6">
+                        <h3 class="text-xl font-semibold text-primary mb-4">Aproximación Inicial y Parámetros</h3>
+                        <div id="vectorX0InputsContainer" class="mb-4">
+                            <p class="text-text-secondary mb-2">Vector Inicial $$x^{(0)}$$:</p>
+                            <div id="vectorX0Inputs" class="vector-input-grid"></div>
+                        </div>
+                        <div class="flex items-center space-x-4 mb-4">
+                            <label for="tolerance" class="text-text-secondary">Tolerancia ($$\epsilon$$):</label>
+                            <input type="number" id="tolerance" value="0.0001" step="0.00001" class="w-32 p-2 rounded-md bg-bg-surface-alt text-text-primary border border-border-color">
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <label for="maxIterations" class="text-text-secondary">Máx. Iteraciones:</label>
+                            <input type="number" id="maxIterations" value="100" min="1" class="w-24 p-2 rounded-md bg-bg-surface-alt text-text-primary border border-border-color">
+                        </div>
+                    </div>
+
+                    <!-- Operation Method Selection -->
+                    <div class="bg-bg-surface-alt rounded-xl overflow-hidden border border-border-color p-6 mb-6">
+                        <h3 class="text-xl font-semibold text-primary mb-4">Seleccionar Método Iterativo</h3>
+                        <div class="flex flex-wrap justify-center gap-4">
+                            <button class="app-button" onclick="calculateSolution('jacobi')">
+                                Método de Jacobi
+                            </button>
+                            <button class="app-button" onclick="calculateSolution('gaussSeidel')">
+                                Método de Gauss-Seidel
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Message Box for Errors/Info -->
+                    <div id="messageBox" class="message-box"></div>
+                </section>
+            </div>
+            
+            <!-- Right Column: Result Display and Formulas -->
+            <div>
+                <section class="mb-8 content-card shadow-sm p-6">
+                    <h2 class="text-2xl font-bold font-poppins text-primary mb-6 flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2 text-electric-blue" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                        </svg>
+                        <span class="title-accent">Vector Solución $$x$$</span>
+                    </h2>
+                    <div id="resultVectorDisplay" class="result-display-area text-center">
+                        <p class="text-text-secondary">La solución aparecerá aquí.</p>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        const themeToggle = document.getElementById('themeToggle');
+        const sunIcon = document.getElementById('sunIcon');
+        const moonIcon = document.getElementById('moonIcon');
+        const themeText = document.getElementById('themeText');
+        const body = document.body;
+
+        // Check for saved theme preference or default to light mode
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        
+        // Apply saved theme
+        if (savedTheme === 'dark') {
+            body.classList.add('dark');
+            sunIcon.style.display = 'none';
+            moonIcon.style.display = 'block';
+            themeText.textContent = 'Modo Claro';
+        } else {
+            sunIcon.style.display = 'block';
+            moonIcon.style.display = 'none';
+            themeText.textContent = 'Modo Oscuro';
+        }
+
+        // Toggle theme
+        themeToggle.addEventListener('click', () => {
+            body.classList.toggle('dark');
+            
+            if (body.classList.contains('dark')) {
+                sunIcon.style.display = 'none';
+                moonIcon.style.display = 'block';
+                themeText.textContent = 'Modo Claro';
+                localStorage.setItem('theme', 'dark');
+            } else {
+                sunIcon.style.display = 'block';
+                moonIcon.style.display = 'none';
+                themeText.textContent = 'Modo Oscuro';
+                localStorage.setItem('theme', 'light');
+            }
+        });
+
+        // Helper function for rounding to avoid floating point inaccuracies
+        function round(value, decimals = 10) {
+            return Number(Math.round(value + 'e' + decimals) + 'e-' + decimals);
+        }
+
+        // Function to generate input fields for matrix A, vector b, and vector x0
+        function generateInputs() {
+            const sizeInput = document.getElementById('systemSize');
+            const size = parseInt(sizeInput.value);
+
+            // Validate size input
+            if (isNaN(size) || size < 2 || size > 5) {
+                document.getElementById('matrixAInputs').innerHTML = '<p class="text-red-400">Por favor, introduce un tamaño válido (entre 2 y 5).</p>';
+                document.getElementById('vectorBInputs').innerHTML = '';
+                document.getElementById('vectorX0Inputs').innerHTML = '';
+                return;
+            }
+
+            // Generate Matrix A inputs
+            const matrixAContainer = document.getElementById('matrixAInputs');
+            matrixAContainer.innerHTML = '';
+            matrixAContainer.style.gridTemplateColumns = `repeat(${size}, minmax(0, 1fr))`;
+            for (let i = 0; i < size; i++) {
+                for (let j = 0; j < size; j++) {
+                    const input = document.createElement('input');
+                    input.type = 'number';
+                    input.value = (i === j) ? '1' : '0'; // Default to identity-like for A
+                    input.id = `matrixA-${i}-${j}`;
+                    matrixAContainer.appendChild(input);
+                }
+            }
+
+            // Generate Vector b inputs
+            const vectorBContainer = document.getElementById('vectorBInputs');
+            vectorBContainer.innerHTML = '';
+            vectorBContainer.style.gridTemplateColumns = `1fr`; // Single column for vector
+            for (let i = 0; i < size; i++) {
+                const input = document.createElement('input');
+                input.type = 'number';
+                input.value = '0'; // Default value
+                input.id = `vectorB-${i}-0`; // Using -0 for column for consistency
+                vectorBContainer.appendChild(input);
+            }
+
+            // Generate Vector x0 inputs
+            const vectorX0Container = document.getElementById('vectorX0Inputs');
+            vectorX0Container.innerHTML = '';
+            vectorX0Container.style.gridTemplateColumns = `1fr`; // Single column for vector
+            for (let i = 0; i < size; i++) {
+                const input = document.createElement('input');
+                input.type = 'number';
+                input.value = '0'; // Default value
+                input.id = `vectorX0-${i}-0`; // Using -0 for column for consistency
+                vectorX0Container.appendChild(input);
+            }
+        }
+
+        // Function to get matrix A values from input fields
+        function getMatrixA() {
+            const size = parseInt(document.getElementById('systemSize').value);
+            const matrix = [];
+            for (let i = 0; i < size; i++) {
+                const row = [];
+                for (let j = 0; j < size; j++) {
+                    const input = document.getElementById(`matrixA-${i}-${j}`);
+                    row.push(parseFloat(input.value || '0'));
+                }
+                matrix.push(row);
+            }
+            return matrix;
+        }
+
+        // Function to get vector b values from input fields
+        function getVectorB() {
+            const size = parseInt(document.getElementById('systemSize').value);
+            const vector = [];
+            for (let i = 0; i < size; i++) {
+                const input = document.getElementById(`vectorB-${i}-0`);
+                vector.push(parseFloat(input.value || '0'));
+            }
+            return vector;
+        }
+
+        // Function to get vector x0 values from input fields
+        function getVectorX0() {
+            const size = parseInt(document.getElementById('systemSize').value);
+            const vector = [];
+            for (let i = 0; i < size; i++) {
+                const input = document.getElementById(`vectorX0-${i}-0`);
+                vector.push(parseFloat(input.value || '0'));
+            }
+            return vector;
+        }
+
+        // Function to get tolerance and max iterations
+        function getTolerance() {
+            return parseFloat(document.getElementById('tolerance').value);
+        }
+
+        function getMaxIterations() {
+            return parseInt(document.getElementById('maxIterations').value);
+        }
+
+        // Function to display a message in the message box
+        function showMessage(message, type = 'info') {
+            const messageBox = document.getElementById('messageBox');
+            messageBox.textContent = message;
+            messageBox.classList.remove('bg-navy-blue', 'bg-red-700', 'border-electric-blue', 'border-red-500');
+            messageBox.classList.add('active');
+
+            if (type === 'error') {
+                messageBox.classList.add('bg-red-700', 'border-red-500');
+            } else {
+                messageBox.classList.add('bg-navy-blue', 'border-electric-blue');
+            }
+        }
+
+        // Function to hide the message box
+        function hideMessageBox() {
+            document.getElementById('messageBox').classList.remove('active');
+        }
+
+        // Function to display a vector using MathJax
+        function displayVector(vector, elementId, iterations = null) {
+            const displayElement = document.getElementById(elementId);
+            if (!vector || vector.length === 0) {
+                displayElement.innerHTML = '<p class="text-text-secondary">Vector vacío o inválido.</p>';
+                if (typeof MathJax !== 'undefined') MathJax.typesetPromise([displayElement]);
+                return;
+            }
+
+            let mathJaxString = '\\begin{pmatrix}';
+            for (let i = 0; i < vector.length; i++) {
+                mathJaxString += round(vector[i]);
+                if (i < vector.length - 1) {
+                    mathJaxString += ' \\\\ ';
+                }
+            }
+            mathJaxString += '\\end{pmatrix}';
+
+            displayElement.innerHTML = `<div class="math-display">$$x = ${mathJaxString}$$</div>`;
+            if (iterations !== null) {
+                displayElement.innerHTML += `<p class="text-text-secondary mt-2">Convergió en ${iterations} iteraciones.</p>`;
+            } else {
+                displayElement.innerHTML += `<p class="text-text-secondary mt-2">No se pudo determinar la convergencia o se alcanzó el máximo de iteraciones.</p>`;
+            }
+            
+            if (typeof MathJax !== 'undefined') MathJax.typesetPromise([displayElement]);
+        }
+
+        // Function to calculate Euclidean norm (for error checking)
+        function euclideanNorm(vector) {
+            let sumSq = 0;
+            for (let i = 0; i < vector.length; i++) {
+                sumSq += vector[i] * vector[i];
+            }
+            return Math.sqrt(sumSq);
+        }
+
+        // Check for diagonal dominance (optional, but good for convergence)
+        function isDiagonallyDominant(A) {
+            const n = A.length;
+            for (let i = 0; i < n; i++) {
+                let diagonalElement = Math.abs(A[i][i]);
+                let sumOffDiagonal = 0;
+                for (let j = 0; j < n; j++) {
+                    if (i !== j) {
+                        sumOffDiagonal += Math.abs(A[i][j]);
+                    }
+                }
+                if (diagonalElement <= sumOffDiagonal) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        // --- Iterative Methods ---
+
+        // Jacobi Method
+        function jacobiMethod(A, b, x0, tol, maxIter) {
+            const n = A.length;
+            let x = [...x0]; // Current approximation
+            let xNew = Array(n).fill(0); // Next approximation
+            let iterations = 0;
+            let error = Infinity;
+
+            if (!isDiagonallyDominant(A)) {
+                showMessage('Advertencia: La matriz no es estrictamente diagonalmente dominante. La convergencia no está garantizada.', 'info');
+            } else {
+                hideMessageBox(); // Clear previous warnings if any
+            }
+
+            for (let k = 0; k < maxIter; k++) {
+                for (let i = 0; i < n; i++) {
+                    let sum = 0;
+                    for (let j = 0; j < n; j++) {
+                        if (i !== j) {
+                            sum += A[i][j] * x[j];
+                        }
+                    }
+                    if (Math.abs(A[i][i]) < 1e-9) { // Check for zero on diagonal
+                        showMessage(`Error: Elemento diagonal a[${i+1}][${i+1}] es cero. No se puede usar Jacobi.`, 'error');
+                        return null;
+                    }
+                    xNew[i] = (b[i] - sum) / A[i][i];
+                }
+
+                // Calculate error (norm of difference between current and new x)
+                let diffVector = Array(n).fill(0);
+                for (let i = 0; i < n; i++) {
+                    diffVector[i] = xNew[i] - x[i];
+                }
+                error = euclideanNorm(diffVector);
+
+                x = [...xNew]; // Update x for next iteration
+                iterations++;
+
+                if (error < tol) {
+                    return { solution: x, iterations: iterations, converged: true };
+                }
+            }
+
+            showMessage('Advertencia: El método de Jacobi no convergió dentro del número máximo de iteraciones.', 'info');
+            return { solution: x, iterations: iterations, converged: false };
+        }
+
+        // Gauss-Seidel Method
+        function gaussSeidelMethod(A, b, x0, tol, maxIter) {
+            const n = A.length;
+            let x = [...x0]; // Current approximation
+            let iterations = 0;
+            let error = Infinity;
+
+            if (!isDiagonallyDominant(A)) {
+                showMessage('Advertencia: La matriz no es estrictamente diagonalmente dominante. La convergencia no está garantizada.', 'info');
+            } else {
+                hideMessageBox(); // Clear previous warnings if any
+            }
+
+            for (let k = 0; k < maxIter; k++) {
+                let xOld = [...x]; // Store x from previous iteration for error calculation
+                for (let i = 0; i < n; i++) {
+                    let sum1 = 0; // Sum for j < i (already updated values)
+                    for (let j = 0; j < i; j++) {
+                        sum1 += A[i][j] * x[j];
+                    }
+                    let sum2 = 0; // Sum for j > i (old values)
+                    for (let j = i + 1; j < n; j++) {
+                        sum2 += A[i][j] * x[j];
+                    }
+                    if (Math.abs(A[i][i]) < 1e-9) { // Check for zero on diagonal
+                        showMessage(`Error: Elemento diagonal a[${i+1}][${i+1}] es cero. No se puede usar Gauss-Seidel.`, 'error');
+                        return null;
+                    }
+                    x[i] = (b[i] - sum1 - sum2) / A[i][i];
+                }
+
+                // Calculate error
+                let diffVector = Array(n).fill(0);
+                for (let i = 0; i < n; i++) {
+                    diffVector[i] = x[i] - xOld[i];
+                }
+                error = euclideanNorm(diffVector);
+                iterations++;
+
+                if (error < tol) {
+                    return { solution: x, iterations: iterations, converged: true };
+                }
+            }
+
+            showMessage('Advertencia: El método de Gauss-Seidel no convergió dentro del número máximo de iteraciones.', 'info');
+            return { solution: x, iterations: iterations, converged: false };
+        }
+
+        // Main function to calculate solution based on selected method
+        function calculateSolution(method) {
+            const A = getMatrixA();
+            const b = getVectorB();
+            const x0 = getVectorX0();
+            const tol = getTolerance();
+            const maxIter = getMaxIterations();
+            const size = A.length;
+
+            // Basic validation
+            if (size === 0 || A[0].length !== size || b.length !== size || x0.length !== size) {
+                showMessage('Error: Asegúrate de que la matriz A sea cuadrada y que los vectores b y x0 tengan el tamaño correcto.', 'error');
+                displayVector(null, 'resultVectorDisplay');
+                return;
+            }
+            if (isNaN(tol) || tol <= 0) {
+                showMessage('Error: La tolerancia debe ser un número positivo.', 'error');
+                displayVector(null, 'resultVectorDisplay');
+                return;
+            }
+            if (isNaN(maxIter) || maxIter <= 0) {
+                showMessage('Error: El número máximo de iteraciones debe ser un entero positivo.', 'error');
+                displayVector(null, 'resultVectorDisplay');
+                return;
+            }
+
+            let result = null;
+            if (method === 'jacobi') {
+                result = jacobiMethod(A, b, x0, tol, maxIter);
+            } else if (method === 'gaussSeidel') {
+                result = gaussSeidelMethod(A, b, x0, tol, maxIter);
+            }
+            
+            if (result && result.solution) {
+                displayVector(result.solution, 'resultVectorDisplay', result.iterations);
+            } else {
+                document.getElementById('resultVectorDisplay').innerHTML = '<p class="text-text-secondary">No se pudo encontrar una solución. Verifica los datos y la convergencia.</p>';
+            }
+        }
+
+        // Initial setup on DOMContentLoaded
+        document.addEventListener('DOMContentLoaded', function() {
+            generateInputs(); // Generate inputs for initial 3x3 system
+            
+            // Ensure MathJax renders initially
+            if (typeof MathJax !== 'undefined') {
+                MathJax.typesetPromise();
+            }
+        });
+    </script>
+</body>
+</html>

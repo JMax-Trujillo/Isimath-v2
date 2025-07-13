@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculadora de Operaciones Básicas de Matrices - Álgebra Lineal</title>
+    <title>Calculadora de Matrices Inversas - Álgebra Lineal</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
     <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
@@ -180,7 +180,7 @@
     <!-- Main Content -->
     <div class="content-container py-8">
         <!-- Title moved here -->
-        <h1 class="text-4xl md:text-5xl font-bold font-poppins mb-8 text-center title-accent">CALCULADORA DE OPERACIONES BÁSICAS DE MATRICES</h1>
+        <h1 class="text-4xl md:text-5xl font-bold font-poppins mb-8 text-center title-accent">CALCULADORA DE MATRICES INVERSAS</h1>
         
         <div class="main-grid">
             <!-- Left Column: Input and Controls -->
@@ -190,51 +190,30 @@
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2 text-electric-blue" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                         </svg>
-                        <span class="title-accent">Definir Matrices</span>
+                        <span class="title-accent">Definir Matriz Cuadrada</span>
                     </h2>
                     
-                    <!-- Matrix A Input -->
+                    <!-- Matrix Input -->
                     <div class="bg-dark-gray rounded-xl overflow-hidden border border-medium-gray p-6 mb-6">
                         <h3 class="text-xl font-semibold text-primary mb-4">Matriz A</h3>
                         <div class="flex items-center space-x-4 mb-4">
-                            <label for="matrixARows" class="text-light-gray">Filas:</label>
-                            <input type="number" id="matrixARows" value="2" min="1" max="10" class="w-20 p-2 rounded-md bg-medium-gray text-white border border-medium-gray" onchange="generateMatrixInputs('A')">
-                            <label for="matrixACols" class="text-light-gray">Columnas:</label>
-                            <input type="number" id="matrixACols" value="2" min="1" max="10" class="w-20 p-2 rounded-md bg-medium-gray text-white border border-medium-gray" onchange="generateMatrixInputs('A')">
+                            <label for="matrixSize" class="text-light-gray">Tamaño (n x n):</label>
+                            <input type="number" id="matrixSize" value="3" min="2" max="4" class="w-20 p-2 rounded-md bg-medium-gray text-white border border-medium-gray" onchange="generateMatrixInputs()">
                         </div>
                         <div id="matrixAInputs" class="matrix-input-grid"></div>
                     </div>
 
-                    <!-- Matrix B Input / Scalar Input -->
+                    <!-- Operation Method Selection -->
                     <div class="bg-dark-gray rounded-xl overflow-hidden border border-medium-gray p-6 mb-6">
-                        <h3 class="text-xl font-semibold text-primary mb-4" id="matrixBTitle">Matriz B / Escalar</h3>
-                        <div id="matrixBControls" class="flex items-center space-x-4 mb-4">
-                            <label for="matrixBRows" class="text-light-gray">Filas:</label>
-                            <input type="number" id="matrixBRows" value="2" min="1" max="10" class="w-20 p-2 rounded-md bg-medium-gray text-white border border-medium-gray" onchange="generateMatrixInputs('B')">
-                            <label for="matrixBCols" class="text-light-gray">Columnas:</label>
-                            <input type="number" id="matrixBCols" value="2" min="1" max="10" class="w-20 p-2 rounded-md bg-medium-gray text-white border border-medium-gray" onchange="generateMatrixInputs('B')">
+                        <h3 class="text-xl font-semibold text-primary mb-4">Seleccionar Método de Cálculo</h3>
+                        <div class="flex flex-wrap justify-center gap-4">
+                            <button id="gaussJordanBtn" class="bg-electric-blue hover:bg-light-blue text-white font-bold py-3 px-6 rounded-lg transition duration-200" onclick="calculateInverse('gaussJordan')">
+                                Gauss-Jordan
+                            </button>
+                            <button id="adjointBtn" class="bg-electric-blue hover:bg-light-blue text-white font-bold py-3 px-6 rounded-lg transition duration-200" onclick="calculateInverse('adjoint')">
+                                Método de la Adjunta (2x2, 3x3)
+                            </button>
                         </div>
-                        <div id="scalarInputContainer" class="hidden mb-4">
-                            <label for="scalarValue" class="text-light-gray mr-2">Valor Escalar:</label>
-                            <input type="number" id="scalarValue" value="2" class="w-24 p-2 rounded-md bg-medium-gray text-white border border-medium-gray">
-                        </div>
-                        <div id="matrixBInputs" class="matrix-input-grid"></div>
-                    </div>
-
-                    <!-- Operation Buttons -->
-                    <div class="flex flex-wrap justify-center gap-4 mb-6">
-                        <button class="bg-electric-blue hover:bg-light-blue text-white font-bold py-3 px-6 rounded-lg transition duration-200" onclick="performOperation('add')">
-                            Suma (A + B)
-                        </button>
-                        <button class="bg-electric-blue hover:bg-light-blue text-white font-bold py-3 px-6 rounded-lg transition duration-200" onclick="performOperation('subtract')">
-                            Resta (A - B)
-                        </button>
-                        <button class="bg-electric-blue hover:bg-light-blue text-white font-bold py-3 px-6 rounded-lg transition duration-200" onclick="performOperation('scalar')">
-                            Multiplicación por Escalar (k * A)
-                        </button>
-                        <button class="bg-electric-blue hover:bg-light-blue text-white font-bold py-3 px-6 rounded-lg transition duration-200" onclick="performOperation('multiply')">
-                            Multiplicación (A × B)
-                        </button>
                     </div>
 
                     <!-- Message Box for Errors/Info -->
@@ -249,10 +228,10 @@
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2 text-electric-blue" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                         </svg>
-                        <span class="title-accent">Resultado</span>
+                        <span class="title-accent">Matriz Inversa ($$A^{-1}$$)</span>
                     </h2>
                     <div id="resultMatrixDisplay" class="matrix-display-area text-center">
-                        <p class="text-light-gray">El resultado de la operación aparecerá aquí.</p>
+                        <p class="text-light-gray">La matriz inversa aparecerá aquí.</p>
                     </div>
                 </section>
 
@@ -267,27 +246,21 @@
                     
                     <div class="space-y-4">
                         <div class="formula-card p-4">
-                            <h3 class="font-semibold text-primary mb-2">Suma de matrices</h3>
-                            <div class="text-center my-2 math-display text-pale-blue">$$(A + B)_{ij} = A_{ij} + B_{ij}$$</div>
-                            <p class="text-sm text-light-gray">Matrices deben tener las mismas dimensiones.</p>
+                            <h3 class="font-semibold text-primary mb-2">Definición de Inversa</h3>
+                            <div class="text-center my-2 math-display text-pale-blue">$$A A^{-1} = A^{-1} A = I$$</div>
+                            <p class="text-sm text-light-gray">Donde \(I\) es la matriz identidad.</p>
                         </div>
                         
                         <div class="formula-card p-4">
-                            <h3 class="font-semibold text-primary mb-2">Resta de matrices</h3>
-                            <div class="text-center my-2 math-display text-pale-blue">$$(A - B)_{ij} = A_{ij} - B_{ij}$$</div>
-                            <p class="text-sm text-light-gray">Matrices deben tener las mismas dimensiones.</p>
+                            <h3 class="font-semibold text-primary mb-2">Método de la Adjunta</h3>
+                            <div class="text-center my-2 math-display text-pale-blue">$$A^{-1} = \frac{1}{\det(A)} \text{adj}(A)$$</div>
+                            <p class="text-sm text-light-gray">Necesita \( \det(A) \neq 0 \).</p>
                         </div>
 
                         <div class="formula-card p-4">
-                            <h3 class="font-semibold text-primary mb-2">Multiplicación por escalar</h3>
-                            <div class="text-center my-2 math-display text-pale-blue">$$(kA)_{ij} = k \cdot A_{ij}$$</div>
-                            <p class="text-sm text-light-gray">Cada elemento se multiplica por el escalar.</p>
-                        </div>
-                        
-                        <div class="formula-card p-4">
-                            <h3 class="font-semibold text-primary mb-2">Multiplicación de matrices</h3>
-                            <div class="text-center my-2 math-display text-pale-blue">$$(AB)_{ij} = \sum_{k=1}^n A_{ik}B_{kj}$$</div>
-                            <p class="text-sm text-light-gray">El número de columnas de A debe ser igual al número de filas de B.</p>
+                            <h3 class="font-semibold text-primary mb-2">Gauss-Jordan</h3>
+                            <div class="text-center my-2 math-display text-pale-blue">$$[A | I] \xrightarrow{\text{operaciones fila}} [I | A^{-1}]$$</div>
+                            <p class="text-sm text-light-gray">Transforma \(A\) en identidad, \(I\) se convierte en \(A^{-1}\).</p>
                         </div>
                     </div>
                 </section>
@@ -296,29 +269,38 @@
     </div>
 
     <script>
-        // Function to generate matrix input fields
-        function generateMatrixInputs(matrixId) {
-            const rowsInput = document.getElementById(`matrix${matrixId}Rows`);
-            const colsInput = document.getElementById(`matrix${matrixId}Cols`);
-            const container = document.getElementById(`matrix${matrixId}Inputs`);
+        // Helper function for rounding to avoid floating point inaccuracies
+        function round(value, decimals = 10) {
+            return Number(Math.round(value + 'e' + decimals) + 'e-' + decimals);
+        }
 
-            const rows = parseInt(rowsInput.value);
-            const cols = parseInt(colsInput.value);
+        // Function to generate matrix input fields based on size
+        function generateMatrixInputs() {
+            const sizeInput = document.getElementById('matrixSize');
+            const container = document.getElementById('matrixAInputs');
+            const size = parseInt(sizeInput.value);
 
-            if (isNaN(rows) || isNaN(cols) || rows <= 0 || cols <= 0) {
-                container.innerHTML = '<p class="text-red-400">Por favor, introduce dimensiones válidas (números positivos).</p>';
+            // Validate size input
+            if (isNaN(size) || size < 2 || size > 4) { // Max size 4 for this app
+                container.innerHTML = '<p class="text-red-400">Por favor, introduce un tamaño válido (entre 2 y 4).</p>';
+                document.getElementById('gaussJordanBtn').disabled = true;
+                document.getElementById('adjointBtn').disabled = true;
                 return;
             }
 
             container.innerHTML = ''; // Clear previous inputs
-            container.style.gridTemplateColumns = `repeat(${cols}, minmax(0, 1fr))`;
+            container.style.gridTemplateColumns = `repeat(${size}, minmax(0, 1fr))`;
 
-            for (let i = 0; i < rows; i++) {
-                for (let j = 0; j < cols; j++) {
+            // Enable/disable Adjoint button based on size
+            document.getElementById('adjointBtn').disabled = (size > 3); // Adjoint only for 2x2 and 3x3
+            document.getElementById('gaussJordanBtn').disabled = false; // Gauss-Jordan for all sizes 2-4
+
+            for (let i = 0; i < size; i++) {
+                for (let j = 0; j < size; j++) {
                     const input = document.createElement('input');
                     input.type = 'number';
                     input.value = '0'; // Default value
-                    input.id = `matrix${matrixId}-${i}-${j}`;
+                    input.id = `matrixA-${i}-${j}`;
                     input.classList.add('p-2', 'rounded-md', 'bg-medium-gray', 'text-white', 'border', 'border-medium-gray', 'text-center');
                     container.appendChild(input);
                 }
@@ -326,16 +308,15 @@
         }
 
         // Function to get matrix values from input fields
-        function getMatrix(matrixId) {
-            const rows = parseInt(document.getElementById(`matrix${matrixId}Rows`).value);
-            const cols = parseInt(document.getElementById(`matrix${matrixId}Cols`).value);
+        function getMatrix() {
+            const size = parseInt(document.getElementById('matrixSize').value);
             const matrix = [];
 
-            for (let i = 0; i < rows; i++) {
+            for (let i = 0; i < size; i++) {
                 const row = [];
-                for (let j = 0; j < cols; j++) {
-                    const input = document.getElementById(`matrix${matrixId}-${i}-${j}`);
-                    row.push(parseFloat(input.value || '0')); // Default to 0 if empty
+                for (let j = 0; j < size; j++) {
+                    const input = document.getElementById(`matrixA-${i}-${j}`);
+                    row.push(parseFloat(input.value || '0')); // Default to 0 if empty or invalid
                 }
                 matrix.push(row);
             }
@@ -372,7 +353,7 @@
 
             let mathJaxString = '\\begin{bmatrix}';
             for (let i = 0; i < matrix.length; i++) {
-                mathJaxString += matrix[i].join(' & ');
+                mathJaxString += matrix[i].map(val => round(val)).join(' & '); // Round values for display
                 if (i < matrix.length - 1) {
                     mathJaxString += ' \\\\ ';
                 }
@@ -383,139 +364,168 @@
             if (typeof MathJax !== 'undefined') MathJax.typesetPromise([displayElement]);
         }
 
-        // Matrix Operations
-        function addMatrices(A, B) {
-            if (A.length !== B.length || A[0].length !== B[0].length) {
-                showMessage('Error: Las matrices deben tener las mismas dimensiones para la suma.', 'error');
-                return null;
+        // --- Determinant Calculation (reused from previous app) ---
+        function determinant(matrix) {
+            const n = matrix.length;
+
+            if (n === 1) {
+                return matrix[0][0];
             }
-            hideMessageBox();
-            const result = [];
-            for (let i = 0; i < A.length; i++) {
-                const row = [];
-                for (let j = 0; j < A[0].length; j++) {
-                    row.push(A[i][j] + B[i][j]);
-                }
-                result.push(row);
+            if (n === 2) {
+                return (matrix[0][0] * matrix[1][1]) - (matrix[0][1] * matrix[1][0]);
             }
-            return result;
+
+            let det = 0;
+            for (let j = 0; j < n; j++) {
+                const submatrix = getSubmatrix(matrix, 0, j);
+                const sign = (j % 2 === 0) ? 1 : -1;
+                det += sign * matrix[0][j] * determinant(submatrix);
+            }
+            return det;
         }
 
-        function subtractMatrices(A, B) {
-            if (A.length !== B.length || A[0].length !== B[0].length) {
-                showMessage('Error: Las matrices deben tener las mismas dimensiones para la resta.', 'error');
-                return null;
-            }
-            hideMessageBox();
-            const result = [];
-            for (let i = 0; i < A.length; i++) {
-                const row = [];
-                for (let j = 0; j < A[0].length; j++) {
-                    row.push(A[i][j] - B[i][j]);
-                }
-                result.push(row);
-            }
-            return result;
+        function getSubmatrix(matrix, rowToRemove, colToRemove) {
+            return matrix.filter((row, i) => i !== rowToRemove)
+                         .map(row => row.filter((val, j) => j !== colToRemove));
         }
 
-        function scalarMultiply(A, scalar) {
-            if (isNaN(scalar)) {
-                showMessage('Error: El escalar debe ser un número válido.', 'error');
-                return null;
-            }
-            hideMessageBox();
-            const result = [];
-            for (let i = 0; i < A.length; i++) {
-                const row = [];
-                for (let j = 0; j < A[0].length; j++) {
-                    row.push(A[i][j] * scalar);
+        // --- Matrix Inversion Methods ---
+
+        // Method 1: Gauss-Jordan Elimination
+        function gaussJordanInverse(matrix) {
+            const n = matrix.length;
+            const augmentedMatrix = [];
+
+            // Create augmented matrix [A | I]
+            for (let i = 0; i < n; i++) {
+                augmentedMatrix[i] = [];
+                for (let j = 0; j < n; j++) {
+                    augmentedMatrix[i][j] = matrix[i][j];
                 }
-                result.push(row);
+                for (let j = 0; j < n; j++) {
+                    augmentedMatrix[i][j + n] = (i === j) ? 1 : 0;
+                }
             }
-            return result;
-        }
 
-        function multiplyMatrices(A, B) {
-            if (A[0].length !== B.length) {
-                showMessage('Error: El número de columnas de la Matriz A debe ser igual al número de filas de la Matriz B para la multiplicación.', 'error');
-                return null;
-            }
-            hideMessageBox();
-            const rowsA = A.length;
-            const colsA = A[0].length;
-            const rowsB = B.length;
-            const colsB = B[0].length;
+            // Apply Gauss-Jordan elimination
+            for (let i = 0; i < n; i++) {
+                // Find pivot
+                let pivotRow = i;
+                for (let k = i + 1; k < n; k++) {
+                    if (Math.abs(augmentedMatrix[k][i]) > Math.abs(augmentedMatrix[pivotRow][i])) {
+                        pivotRow = k;
+                    }
+                }
+                [augmentedMatrix[i], augmentedMatrix[pivotRow]] = [augmentedMatrix[pivotRow], augmentedMatrix[i]];
 
-            const result = Array(rowsA).fill(0).map(() => Array(colsB).fill(0));
+                let pivot = augmentedMatrix[i][i];
+                if (Math.abs(pivot) < 1e-9) { // Check for singular matrix (pivot is close to zero)
+                    showMessage('Error: La matriz es singular (determinante cero), no tiene inversa.', 'error');
+                    return null;
+                }
 
-            for (let i = 0; i < rowsA; i++) {
-                for (let j = 0; j < colsB; j++) {
-                    for (let k = 0; k < colsA; k++) {
-                        result[i][j] += A[i][k] * B[k][j];
+                // Normalize row
+                for (let j = i; j < 2 * n; j++) {
+                    augmentedMatrix[i][j] /= pivot;
+                }
+
+                // Eliminate other rows
+                for (let k = 0; k < n; k++) {
+                    if (k !== i) {
+                        let factor = augmentedMatrix[k][i];
+                        for (let j = i; j < 2 * n; j++) {
+                            augmentedMatrix[k][j] -= factor * augmentedMatrix[i][j];
+                        }
                     }
                 }
             }
-            return result;
+
+            // Extract the inverse matrix
+            const inverseMatrix = [];
+            for (let i = 0; i < n; i++) {
+                inverseMatrix[i] = [];
+                for (let j = 0; j < n; j++) {
+                    inverseMatrix[i][j] = augmentedMatrix[i][j + n];
+                }
+            }
+            return inverseMatrix;
         }
 
-        // Main function to perform selected operation
-        function performOperation(operationType) {
-            const matrixA = getMatrix('A');
-            let result = null;
+        // Method 2: Adjoint Method
+        function adjointInverse(matrix) {
+            const n = matrix.length;
 
-            if (operationType === 'scalar') {
-                const scalarValue = parseFloat(document.getElementById('scalarValue').value);
-                result = scalarMultiply(matrixA, scalarValue);
-            } else {
-                const matrixB = getMatrix('B');
-                if (operationType === 'add') {
-                    result = addMatrices(matrixA, matrixB);
-                } else if (operationType === 'subtract') {
-                    result = subtractMatrices(matrixA, matrixB);
-                } else if (operationType === 'multiply') {
-                    result = multiplyMatrices(matrixA, matrixB);
+            if (n !== 2 && n !== 3) {
+                showMessage('Error: El método de la Adjunta solo es práctico para matrices 2x2 y 3x3.', 'error');
+                return null;
+            }
+
+            const detA = determinant(matrix);
+            if (Math.abs(detA) < 1e-9) { // Check for singular matrix
+                showMessage('Error: La matriz es singular (determinante cero), no tiene inversa.', 'error');
+                return null;
+            }
+
+            // Calculate matrix of cofactors
+            const cofactorMatrix = Array(n).fill(0).map(() => Array(n).fill(0));
+            for (let i = 0; i < n; i++) {
+                for (let j = 0; j < n; j++) {
+                    const sub = getSubmatrix(matrix, i, j);
+                    const sign = ((i + j) % 2 === 0) ? 1 : -1;
+                    cofactorMatrix[i][j] = sign * determinant(sub);
                 }
+            }
+
+            // Transpose the cofactor matrix to get the adjoint
+            const adjointMatrix = Array(n).fill(0).map(() => Array(n).fill(0));
+            for (let i = 0; i < n; i++) {
+                for (let j = 0; j < n; j++) {
+                    adjointMatrix[j][i] = cofactorMatrix[i][j]; // Transpose
+                }
+            }
+
+            // Divide adjoint by determinant
+            const inverse = Array(n).fill(0).map(() => Array(n).fill(0));
+            for (let i = 0; i < n; i++) {
+                for (let j = 0; j < n; j++) {
+                    inverse[i][j] = adjointMatrix[i][j] / detA;
+                }
+            }
+            return inverse;
+        }
+
+        // Main function to calculate inverse based on selected method
+        function calculateInverse(method) {
+            const matrix = getMatrix();
+            const size = matrix.length;
+
+            // Basic validation for square matrix
+            if (size === 0 || matrix[0].length !== size) {
+                showMessage('Error: La matriz debe ser cuadrada (n x n) y no vacía.', 'error');
+                displayMatrix(null, 'resultMatrixDisplay');
+                return;
+            }
+
+            hideMessageBox(); // Clear any previous messages
+
+            let result = null;
+            if (method === 'gaussJordan') {
+                result = gaussJordanInverse(matrix);
+            } else if (method === 'adjoint') {
+                result = adjointInverse(matrix);
             }
             
             if (result) {
                 displayMatrix(result, 'resultMatrixDisplay');
             } else {
-                document.getElementById('resultMatrixDisplay').innerHTML = '<p class="text-light-gray">No se pudo realizar la operación. Verifica las dimensiones y los valores.</p>';
+                document.getElementById('resultMatrixDisplay').innerHTML = '<p class="text-light-gray">No se pudo calcular la inversa. Verifica las dimensiones y si la matriz es singular.</p>';
             }
         }
 
         // Initial setup on DOMContentLoaded
         document.addEventListener('DOMContentLoaded', function() {
-            generateMatrixInputs('A');
-            generateMatrixInputs('B');
-
-            // Set up event listeners for operation buttons to toggle input visibility
-            const scalarInputContainer = document.getElementById('scalarInputContainer');
-            const matrixBControls = document.getElementById('matrixBControls');
-            const matrixBInputs = document.getElementById('matrixBInputs');
-            const matrixBTitle = document.getElementById('matrixBTitle');
-
-            document.querySelectorAll('button[onclick^="performOperation"]').forEach(button => {
-                button.addEventListener('click', (event) => {
-                    const opType = event.target.onclick.toString().match(/performOperation\('(\w+)'\)/)[1];
-                    if (opType === 'scalar') {
-                        scalarInputContainer.classList.remove('hidden');
-                        matrixBControls.classList.add('hidden');
-                        matrixBInputs.classList.add('hidden');
-                        matrixBTitle.textContent = 'Escalar';
-                    } else {
-                        scalarInputContainer.classList.add('hidden');
-                        matrixBControls.classList.remove('hidden');
-                        matrixBInputs.classList.remove('hidden');
-                        matrixBTitle.textContent = 'Matriz B';
-                    }
-                });
-            });
-
-            // Initial display of matrices (though not strictly necessary for this app, good for consistency)
-            // displayMatrix(getMatrix('A'), 'matrixADisplay'); // No dedicated display for input matrices
-            // displayMatrix(getMatrix('B'), 'matrixBDisplay'); // No dedicated display for input matrices
-
+            generateMatrixInputs(); // Generate inputs for initial 3x3 matrix
+            
             // Ensure MathJax renders initially
             if (typeof MathJax !== 'undefined') {
                 MathJax.typesetPromise();
