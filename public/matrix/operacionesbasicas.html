@@ -3,520 +3,801 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculadora de Operaciones Básicas de Matrices - Álgebra Lineal</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
-    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Matrix Operations</title>
     <style>
         :root {
-            --midnight-blue: #0f172a;
-            --deep-blue: #1e293b;
-            --navy-blue: #1e3a8a;
-            --electric-blue: #3b82f6;
-            --light-blue: #60a5fa;
-            --pale-blue: #bfdbfe;
-            --dark-gray: #0f172a;
-            --medium-gray: #334155;
-            --light-gray: #94a3b8;
-            --white: #f8fafc;
-        }
-        
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--midnight-blue);
-            color: var(--white);
-            margin: 0;
-            padding: 0;
-            min-height: 100vh;
-        }
-        
-        .math-display {
-            font-size: 1.1rem;
-            overflow-x: auto;
-            overflow-y: hidden;
-            color: var(--pale-blue);
-        }
-        
-        .formula-card {
-            transition: all 0.3s ease;
-            box-shadow: 0 2px 4px rgba(2, 6, 23, 0.3);
-            overflow: hidden;
-            background-color: var(--deep-blue);
-            border: 1px solid var(--medium-gray);
-            border-radius: 0.75rem;
-        }
-        
-        .formula-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 12px rgba(2, 6, 23, 0.5);
-            border-color: var(--electric-blue);
-        }
-        
-        .content-container {
-            max-width: 95%;
-            margin: 0 auto;
-            padding: 1rem;
-        }
-        
-        /* Modified main-grid for responsive layout */
-        .main-grid {
-            display: grid;
-            grid-template-columns: 1fr; /* Single column for mobile */
-            gap: 1.5rem;
-        }
-        
-        @media (min-width: 1024px) {
-            .main-grid {
-                grid-template-columns: 1fr 1fr; /* Two columns for desktop */
-            }
-        }
-        
-        .content-card {
-            background-color: var(--deep-blue);
-            box-shadow: 0 2px 4px rgba(2, 6, 23, 0.3);
-            border: 1px solid var(--medium-gray);
-            border-radius: 0.75rem;
-        }
-        
-        .title-accent {
-            position: relative;
-            display: inline-block;
-        }
-        
-        .title-accent::after {
-            content: "";
-            position: absolute;
-            bottom: -8px;
-            left: 0;
-            width: 50%;
-            height: 3px;
-            background: linear-gradient(90deg, var(--electric-blue), transparent);
-            border-radius: 3px;
-        }
-        
-        .text-primary {
-            color: var(--white);
-        }
-        
-        .text-secondary {
-            color: var(--light-gray);
-        }
-        
-        .bg-light {
-            background-color: rgba(30, 41, 59, 0.7);
-            border: 1px solid var(--medium-gray);
-        }
-        
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
-        
-        ::-webkit-scrollbar-track {
-            background: var(--midnight-blue);
-        }
-        
-        ::-webkit-scrollbar-thumb {
-            background: var(--navy-blue);
-            border-radius: 4px;
-        }
-        
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--electric-blue);
-        }
-        
-        input[type="number"]::-webkit-outer-spin-button,
-        input[type="number"]::-webkit-inner-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
+            --light-bg-primary: #ffffff;
+            --section-bg: #f8f9fa;
+            --section-text: #212529;
+            --section-description-text: #6c757d;
+            --button-text-color: #007bff;
+            --button-border-color: #007bff;
+            --button-hover-bg: #007bff;
+            --button-hover-text: #ffffff;
+            --input-bg: #ffffff;
+            --input-border: #ced4da;
+            --input-text: #495057;
+            --error-color: #dc3545;
+            --success-color: #28a745;
+            --shadow: rgba(0, 0, 0, 0.1);
         }
 
-        .matrix-input-grid {
+        body.dark {
+            --light-bg-primary: #1a1a1a;
+            --section-bg: #2d2d2d;
+            --section-text: #ffffff;
+            --section-description-text: #b0b0b0;
+            --button-text-color: #4dabf7;
+            --button-border-color: #4dabf7;
+            --button-hover-bg: #4dabf7;
+            --button-hover-text: #000000;
+            --input-bg: #3a3a3a;
+            --input-border: #555555;
+            --input-text: #ffffff;
+            --error-color: #f56565;
+            --success-color: #48bb78;
+            --shadow: rgba(0, 0, 0, 0.3);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--light-bg-primary);
+            color: var(--section-text);
+            line-height: 1.6;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            color: var(--section-text);
+        }
+
+        .header p {
+            color: var(--section-description-text);
+            font-size: 1.1rem;
+        }
+
+        .theme-toggle {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background: transparent;
+            border: 2px solid var(--button-border-color);
+            color: var(--button-text-color);
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .theme-toggle:hover {
+            background-color: var(--button-hover-bg);
+            color: var(--button-hover-text);
+            border-color: var(--button-hover-bg);
+        }
+
+        .main-content {
             display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .section {
+            background-color: var(--section-bg);
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px var(--shadow);
+            transition: background-color 0.3s ease;
+        }
+
+        .section h2 {
+            color: var(--section-text);
+            margin-bottom: 1.5rem;
+            font-size: 1.8rem;
+        }
+
+        .operation-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .operation-btn {
+            background-color: transparent;
+            color: var(--button-text-color);
+            border: 2px solid var(--button-border-color);
+            padding: 0.75rem 1.5rem;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+            font-weight: 500;
+        }
+
+        .operation-btn:hover {
+            background-color: var(--button-hover-bg);
+            color: var(--button-hover-text);
+            border-color: var(--button-hover-bg);
+        }
+
+        .operation-btn.active {
+            background-color: var(--button-hover-bg);
+            color: var(--button-hover-text);
+            border-color: var(--button-hover-bg);
+        }
+
+        .matrix-controls {
+            display: none;
+            margin-bottom: 2rem;
+        }
+
+        .matrix-controls.active {
+            display: block;
+        }
+
+        .matrix-group {
+            margin-bottom: 2rem;
+        }
+
+        .matrix-group h3 {
+            color: var(--section-text);
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+
+        .matrix-size-controls {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .size-control {
+            display: flex;
+            align-items: center;
             gap: 0.5rem;
         }
 
-        .matrix-input-grid input {
-            width: 100%;
+        .size-control label {
+            color: var(--section-text);
+            font-weight: 500;
+        }
+
+        .size-input {
+            width: 60px;
             padding: 0.5rem;
-            background-color: var(--dark-gray);
-            border: 1px solid var(--medium-gray);
-            border-radius: 0.25rem;
-            color: var(--white);
+            border: 2px solid var(--input-border);
+            border-radius: 8px;
+            background-color: var(--input-bg);
+            color: var(--input-text);
             text-align: center;
         }
 
-        .matrix-display-area {
-            min-height: 100px;
-            background-color: var(--dark-gray);
-            border: 1px solid var(--medium-gray);
-            border-radius: 0.5rem;
-            padding: 1rem;
-            display: flex;
+        .matrix-grid {
+            display: grid;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
             justify-content: center;
-            align-items: center;
-            overflow-x: auto;
         }
 
-        .message-box {
-            background-color: var(--navy-blue);
-            color: var(--white);
-            padding: 1rem;
-            border-radius: 0.5rem;
-            margin-top: 1rem;
-            display: none; /* Hidden by default */
-            border: 1px solid var(--electric-blue);
+        .matrix-cell {
+            width: 60px;
+            height: 40px;
+            padding: 0.25rem;
+            border: 2px solid var(--input-border);
+            border-radius: 6px;
+            background-color: var(--input-bg);
+            color: var(--input-text);
+            text-align: center;
+            font-size: 0.9rem;
         }
-        .message-box.active {
-            display: block;
+
+        .matrix-cell:focus {
+            outline: none;
+            border-color: var(--button-border-color);
+        }
+
+        .calculate-btn {
+            background-color: transparent;
+            color: var(--button-text-color);
+            border: 2px solid var(--button-border-color);
+            padding: 1rem 2rem;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1.1rem;
+            font-weight: 600;
+            width: 100%;
+        }
+
+        .calculate-btn:hover {
+            background-color: var(--button-hover-bg);
+            color: var(--button-hover-text);
+            border-color: var(--button-hover-bg);
+        }
+
+        .calculate-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .result-display {
+            min-height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .result-matrix {
+            display: grid;
+            gap: 0.5rem;
+            justify-content: center;
+        }
+
+        .result-cell {
+            width: 60px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--input-bg);
+            border: 2px solid var(--input-border);
+            border-radius: 6px;
+            color: var(--input-text);
+            font-weight: 500;
+        }
+
+        .error-message {
+            color: var(--error-color);
+            font-weight: 500;
+            text-align: center;
+            padding: 1rem;
+            background-color: rgba(220, 53, 69, 0.1);
+            border-radius: 8px;
+            border: 1px solid var(--error-color);
+        }
+
+        .placeholder-text {
+            color: var(--section-description-text);
+            font-style: italic;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .theme-toggle {
+                position: relative;
+                margin-top: 1rem;
+            }
+
+            .operation-buttons {
+                grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+                gap: 0.5rem;
+            }
+
+            .operation-btn {
+                padding: 0.6rem 1rem;
+                font-size: 0.9rem;
+            }
+
+            .matrix-size-controls {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .matrix-cell {
+                width: 50px;
+                height: 35px;
+                font-size: 0.8rem;
+            }
+
+            .result-cell {
+                width: 50px;
+                height: 35px;
+                font-size: 0.8rem;
+            }
+
+            .section {
+                padding: 1.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 10px;
+            }
+
+            .header h1 {
+                font-size: 1.8rem;
+            }
+
+            .matrix-cell {
+                width: 45px;
+                height: 32px;
+                font-size: 0.75rem;
+            }
+
+            .result-cell {
+                width: 45px;
+                height: 32px;
+                font-size: 0.75rem;
+            }
+
+            .operation-buttons {
+                grid-template-columns: 1fr;
+            }
+        }
+        .app__hidden {
+            display: none;
         }
     </style>
 </head>
 <body>
-    <!-- Main Content -->
-    <div class="content-container py-8">
-        <!-- Title moved here -->
-        <h1 class="text-4xl md:text-5xl font-bold font-poppins mb-8 text-center title-accent">CALCULADORA DE OPERACIONES BÁSICAS DE MATRICES</h1>
-        
-        <div class="main-grid">
-            <!-- Left Column: Input and Controls -->
-            <div>
-                <section class="mb-6 content-card shadow-sm p-6">
-                    <h2 class="text-2xl font-bold font-poppins text-primary mb-6 flex items-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2 text-electric-blue" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-                        </svg>
-                        <span class="title-accent">Definir Matrices</span>
-                    </h2>
+    <div class="container">
+        <div class="header">
+            <h1>Operaciones de Matrices</h1>
+            <p>Realiza operaciones básicas con matrices de forma interactiva</p>
+            <button class="theme-toggle app__hidden" id="themeToggle">🌙 Modo Oscuro</button>
+        </div>
+
+        <div class="main-content">
+            <div class="section" id="input-area">
+                <h2>Área de Entrada</h2>
+                
+                <div class="operation-buttons">
+                    <button class="operation-btn" data-operation="suma">Suma</button>
+                    <button class="operation-btn" data-operation="resta">Resta</button>
+                    <button class="operation-btn" data-operation="multiplicacion">Multiplicación</button>
+                    <button class="operation-btn" data-operation="traspuesta">Traspuesta</button>
+                </div>
+
+                <div class="matrix-controls" id="suma-controls">
+                    <div class="matrix-group">
+                        <h3>Matriz A</h3>
+                        <div class="matrix-size-controls">
+                            <div class="size-control">
+                                <label>Filas:</label>
+                                <input type="number" class="size-input" id="suma-a-rows" value="2" min="1" max="10">
+                            </div>
+                            <div class="size-control">
+                                <label>Columnas:</label>
+                                <input type="number" class="size-input" id="suma-a-cols" value="2" min="1" max="10">
+                            </div>
+                        </div>
+                        <div class="matrix-grid" id="suma-matrix-a"></div>
+                    </div>
                     
-                    <!-- Matrix A Input -->
-                    <div class="bg-dark-gray rounded-xl overflow-hidden border border-medium-gray p-6 mb-6">
-                        <h3 class="text-xl font-semibold text-primary mb-4">Matriz A</h3>
-                        <div class="flex items-center space-x-4 mb-4">
-                            <label for="matrixARows" class="text-light-gray">Filas:</label>
-                            <input type="number" id="matrixARows" value="2" min="1" max="10" class="w-20 p-2 rounded-md bg-medium-gray text-white border border-medium-gray" onchange="generateMatrixInputs('A')">
-                            <label for="matrixACols" class="text-light-gray">Columnas:</label>
-                            <input type="number" id="matrixACols" value="2" min="1" max="10" class="w-20 p-2 rounded-md bg-medium-gray text-white border border-medium-gray" onchange="generateMatrixInputs('A')">
+                    <div class="matrix-group">
+                        <h3>Matriz B</h3>
+                        <div class="matrix-size-controls">
+                            <div class="size-control">
+                                <label>Filas:</label>
+                                <input type="number" class="size-input" id="suma-b-rows" value="2" min="1" max="10">
+                            </div>
+                            <div class="size-control">
+                                <label>Columnas:</label>
+                                <input type="number" class="size-input" id="suma-b-cols" value="2" min="1" max="10">
+                            </div>
                         </div>
-                        <div id="matrixAInputs" class="matrix-input-grid"></div>
+                        <div class="matrix-grid" id="suma-matrix-b"></div>
                     </div>
+                </div>
 
-                    <!-- Matrix B Input / Scalar Input -->
-                    <div class="bg-dark-gray rounded-xl overflow-hidden border border-medium-gray p-6 mb-6">
-                        <h3 class="text-xl font-semibold text-primary mb-4" id="matrixBTitle">Matriz B / Escalar</h3>
-                        <div id="matrixBControls" class="flex items-center space-x-4 mb-4">
-                            <label for="matrixBRows" class="text-light-gray">Filas:</label>
-                            <input type="number" id="matrixBRows" value="2" min="1" max="10" class="w-20 p-2 rounded-md bg-medium-gray text-white border border-medium-gray" onchange="generateMatrixInputs('B')">
-                            <label for="matrixBCols" class="text-light-gray">Columnas:</label>
-                            <input type="number" id="matrixBCols" value="2" min="1" max="10" class="w-20 p-2 rounded-md bg-medium-gray text-white border border-medium-gray" onchange="generateMatrixInputs('B')">
+                <div class="matrix-controls" id="resta-controls">
+                    <div class="matrix-group">
+                        <h3>Matriz A</h3>
+                        <div class="matrix-size-controls">
+                            <div class="size-control">
+                                <label>Filas:</label>
+                                <input type="number" class="size-input" id="resta-a-rows" value="2" min="1" max="10">
+                            </div>
+                            <div class="size-control">
+                                <label>Columnas:</label>
+                                <input type="number" class="size-input" id="resta-a-cols" value="2" min="1" max="10">
+                            </div>
                         </div>
-                        <div id="scalarInputContainer" class="hidden mb-4">
-                            <label for="scalarValue" class="text-light-gray mr-2">Valor Escalar:</label>
-                            <input type="number" id="scalarValue" value="2" class="w-24 p-2 rounded-md bg-medium-gray text-white border border-medium-gray">
+                        <div class="matrix-grid" id="resta-matrix-a"></div>
+                    </div>
+                    
+                    <div class="matrix-group">
+                        <h3>Matriz B</h3>
+                        <div class="matrix-size-controls">
+                            <div class="size-control">
+                                <label>Filas:</label>
+                                <input type="number" class="size-input" id="resta-b-rows" value="2" min="1" max="10">
+                            </div>
+                            <div class="size-control">
+                                <label>Columnas:</label>
+                                <input type="number" class="size-input" id="resta-b-cols" value="2" min="1" max="10">
+                            </div>
                         </div>
-                        <div id="matrixBInputs" class="matrix-input-grid"></div>
+                        <div class="matrix-grid" id="resta-matrix-b"></div>
                     </div>
+                </div>
 
-                    <!-- Operation Buttons -->
-                    <div class="flex flex-wrap justify-center gap-4 mb-6">
-                        <button class="bg-electric-blue hover:bg-light-blue text-white font-bold py-3 px-6 rounded-lg transition duration-200" onclick="performOperation('add')">
-                            Suma (A + B)
-                        </button>
-                        <button class="bg-electric-blue hover:bg-light-blue text-white font-bold py-3 px-6 rounded-lg transition duration-200" onclick="performOperation('subtract')">
-                            Resta (A - B)
-                        </button>
-                        <button class="bg-electric-blue hover:bg-light-blue text-white font-bold py-3 px-6 rounded-lg transition duration-200" onclick="performOperation('scalar')">
-                            Multiplicación por Escalar (k * A)
-                        </button>
-                        <button class="bg-electric-blue hover:bg-light-blue text-white font-bold py-3 px-6 rounded-lg transition duration-200" onclick="performOperation('multiply')">
-                            Multiplicación (A × B)
-                        </button>
+                <div class="matrix-controls" id="multiplicacion-controls">
+                    <div class="matrix-group">
+                        <h3>Matriz A</h3>
+                        <div class="matrix-size-controls">
+                            <div class="size-control">
+                                <label>Filas:</label>
+                                <input type="number" class="size-input" id="mult-a-rows" value="2" min="1" max="10">
+                            </div>
+                            <div class="size-control">
+                                <label>Columnas:</label>
+                                <input type="number" class="size-input" id="mult-a-cols" value="3" min="1" max="10">
+                            </div>
+                        </div>
+                        <div class="matrix-grid" id="mult-matrix-a"></div>
                     </div>
+                    
+                    <div class="matrix-group">
+                        <h3>Matriz B</h3>
+                        <div class="matrix-size-controls">
+                            <div class="size-control">
+                                <label>Filas:</label>
+                                <input type="number" class="size-input" id="mult-b-rows" value="3" min="1" max="10">
+                            </div>
+                            <div class="size-control">
+                                <label>Columnas:</label>
+                                <input type="number" class="size-input" id="mult-b-cols" value="2" min="1" max="10">
+                            </div>
+                        </div>
+                        <div class="matrix-grid" id="mult-matrix-b"></div>
+                    </div>
+                </div>
 
-                    <!-- Message Box for Errors/Info -->
-                    <div id="messageBox" class="message-box"></div>
-                </section>
+                <div class="matrix-controls" id="traspuesta-controls">
+                    <div class="matrix-group">
+                        <h3>Matriz A</h3>
+                        <div class="matrix-size-controls">
+                            <div class="size-control">
+                                <label>Filas:</label>
+                                <input type="number" class="size-input" id="trans-a-rows" value="3" min="1" max="10">
+                            </div>
+                            <div class="size-control">
+                                <label>Columnas:</label>
+                                <input type="number" class="size-input" id="trans-a-cols" value="2" min="1" max="10">
+                            </div>
+                        </div>
+                        <div class="matrix-grid" id="trans-matrix-a"></div>
+                    </div>
+                </div>
+
+                <button class="calculate-btn" id="calculate-btn" disabled>Calcular</button>
             </div>
-            
-            <!-- Right Column: Result Display and Formulas -->
-            <div>
-                <section class="mb-8 content-card shadow-sm p-6">
-                    <h2 class="text-2xl font-bold font-poppins text-primary mb-6 flex items-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2 text-electric-blue" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                        </svg>
-                        <span class="title-accent">Resultado</span>
-                    </h2>
-                    <div id="resultMatrixDisplay" class="matrix-display-area text-center">
-                        <p class="text-light-gray">El resultado de la operación aparecerá aquí.</p>
-                    </div>
-                </section>
 
-                <!-- Formulas Section -->
-                <section class="mb-8 content-card shadow-sm p-6">
-                    <h2 class="text-2xl font-bold font-poppins text-primary mb-6 flex items-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2 text-electric-blue" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                        </svg>
-                        <span class="title-accent">Fórmulas Esenciales</span>
-                    </h2>
-                    
-                    <div class="space-y-4">
-                        <div class="formula-card p-4">
-                            <h3 class="font-semibold text-primary mb-2">Suma de matrices</h3>
-                            <div class="text-center my-2 math-display text-pale-blue">$$(A + B)_{ij} = A_{ij} + B_{ij}$$</div>
-                            <p class="text-sm text-light-gray">Matrices deben tener las mismas dimensiones.</p>
-                        </div>
-                        
-                        <div class="formula-card p-4">
-                            <h3 class="font-semibold text-primary mb-2">Resta de matrices</h3>
-                            <div class="text-center my-2 math-display text-pale-blue">$$(A - B)_{ij} = A_{ij} - B_{ij}$$</div>
-                            <p class="text-sm text-light-gray">Matrices deben tener las mismas dimensiones.</p>
-                        </div>
-
-                        <div class="formula-card p-4">
-                            <h3 class="font-semibold text-primary mb-2">Multiplicación por escalar</h3>
-                            <div class="text-center my-2 math-display text-pale-blue">$$(kA)_{ij} = k \cdot A_{ij}$$</div>
-                            <p class="text-sm text-light-gray">Cada elemento se multiplica por el escalar.</p>
-                        </div>
-                        
-                        <div class="formula-card p-4">
-                            <h3 class="font-semibold text-primary mb-2">Multiplicación de matrices</h3>
-                            <div class="text-center my-2 math-display text-pale-blue">$$(AB)_{ij} = \sum_{k=1}^n A_{ik}B_{kj}$$</div>
-                            <p class="text-sm text-light-gray">El número de columnas de A debe ser igual al número de filas de B.</p>
-                        </div>
+            <div class="section" id="output-area">
+                <h2>Área de Salida</h2>
+                <div class="result-display" id="result-display">
+                    <div class="placeholder-text">
+                        Selecciona una operación y completa las matrices para ver el resultado
                     </div>
-                </section>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
-        // Function to generate matrix input fields
-        function generateMatrixInputs(matrixId) {
-            const rowsInput = document.getElementById(`matrix${matrixId}Rows`);
-            const colsInput = document.getElementById(`matrix${matrixId}Cols`);
-            const container = document.getElementById(`matrix${matrixId}Inputs`);
-
-            const rows = parseInt(rowsInput.value);
-            const cols = parseInt(colsInput.value);
-
-            if (isNaN(rows) || isNaN(cols) || rows <= 0 || cols <= 0) {
-                container.innerHTML = '<p class="text-red-400">Por favor, introduce dimensiones válidas (números positivos).</p>';
-                return;
+        class MatrixCalculator {
+            constructor() {
+                this.currentOperation = null;
+                this.initializeEventListeners();
+                this.initializeTheme();
             }
 
-            container.innerHTML = ''; // Clear previous inputs
-            container.style.gridTemplateColumns = `repeat(${cols}, minmax(0, 1fr))`;
+            initializeEventListeners() {
+                // Operation buttons
+                document.querySelectorAll('.operation-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        this.selectOperation(e.target.dataset.operation);
+                    });
+                });
 
-            for (let i = 0; i < rows; i++) {
-                for (let j = 0; j < cols; j++) {
-                    const input = document.createElement('input');
-                    input.type = 'number';
-                    input.value = '0'; // Default value
-                    input.id = `matrix${matrixId}-${i}-${j}`;
-                    input.classList.add('p-2', 'rounded-md', 'bg-medium-gray', 'text-white', 'border', 'border-medium-gray', 'text-center');
-                    container.appendChild(input);
-                }
-            }
-        }
+                // Calculate button
+                document.getElementById('calculate-btn').addEventListener('click', () => {
+                    this.calculate();
+                });
 
-        // Function to get matrix values from input fields
-        function getMatrix(matrixId) {
-            const rows = parseInt(document.getElementById(`matrix${matrixId}Rows`).value);
-            const cols = parseInt(document.getElementById(`matrix${matrixId}Cols`).value);
-            const matrix = [];
+                // Theme toggle
+                document.getElementById('themeToggle').addEventListener('click', () => {
+                    this.toggleTheme();
+                });
 
-            for (let i = 0; i < rows; i++) {
-                const row = [];
-                for (let j = 0; j < cols; j++) {
-                    const input = document.getElementById(`matrix${matrixId}-${i}-${j}`);
-                    row.push(parseFloat(input.value || '0')); // Default to 0 if empty
-                }
-                matrix.push(row);
-            }
-            return matrix;
-        }
-
-        // Function to display a message in the message box
-        function showMessage(message, type = 'info') {
-            const messageBox = document.getElementById('messageBox');
-            messageBox.textContent = message;
-            messageBox.classList.remove('bg-navy-blue', 'bg-red-700', 'border-electric-blue', 'border-red-500');
-            messageBox.classList.add('active');
-
-            if (type === 'error') {
-                messageBox.classList.add('bg-red-700', 'border-red-500');
-            } else {
-                messageBox.classList.add('bg-navy-blue', 'border-electric-blue');
-            }
-        }
-
-        // Function to hide the message box
-        function hideMessageBox() {
-            document.getElementById('messageBox').classList.remove('active');
-        }
-
-        // Function to display a matrix using MathJax
-        function displayMatrix(matrix, elementId) {
-            const displayElement = document.getElementById(elementId);
-            if (!matrix || matrix.length === 0 || matrix[0].length === 0) {
-                displayElement.innerHTML = '<p class="text-light-gray">Matriz vacía o inválida.</p>';
-                if (typeof MathJax !== 'undefined') MathJax.typesetPromise([displayElement]);
-                return;
+                // Matrix size controls
+                this.initializeSizeControls();
             }
 
-            let mathJaxString = '\\begin{bmatrix}';
-            for (let i = 0; i < matrix.length; i++) {
-                mathJaxString += matrix[i].join(' & ');
-                if (i < matrix.length - 1) {
-                    mathJaxString += ' \\\\ ';
-                }
-            }
-            mathJaxString += '\\end{bmatrix}';
-
-            displayElement.innerHTML = `$$${mathJaxString}$$`;
-            if (typeof MathJax !== 'undefined') MathJax.typesetPromise([displayElement]);
-        }
-
-        // Matrix Operations
-        function addMatrices(A, B) {
-            if (A.length !== B.length || A[0].length !== B[0].length) {
-                showMessage('Error: Las matrices deben tener las mismas dimensiones para la suma.', 'error');
-                return null;
-            }
-            hideMessageBox();
-            const result = [];
-            for (let i = 0; i < A.length; i++) {
-                const row = [];
-                for (let j = 0; j < A[0].length; j++) {
-                    row.push(A[i][j] + B[i][j]);
-                }
-                result.push(row);
-            }
-            return result;
-        }
-
-        function subtractMatrices(A, B) {
-            if (A.length !== B.length || A[0].length !== B[0].length) {
-                showMessage('Error: Las matrices deben tener las mismas dimensiones para la resta.', 'error');
-                return null;
-            }
-            hideMessageBox();
-            const result = [];
-            for (let i = 0; i < A.length; i++) {
-                const row = [];
-                for (let j = 0; j < A[0].length; j++) {
-                    row.push(A[i][j] - B[i][j]);
-                }
-                result.push(row);
-            }
-            return result;
-        }
-
-        function scalarMultiply(A, scalar) {
-            if (isNaN(scalar)) {
-                showMessage('Error: El escalar debe ser un número válido.', 'error');
-                return null;
-            }
-            hideMessageBox();
-            const result = [];
-            for (let i = 0; i < A.length; i++) {
-                const row = [];
-                for (let j = 0; j < A[0].length; j++) {
-                    row.push(A[i][j] * scalar);
-                }
-                result.push(row);
-            }
-            return result;
-        }
-
-        function multiplyMatrices(A, B) {
-            if (A[0].length !== B.length) {
-                showMessage('Error: El número de columnas de la Matriz A debe ser igual al número de filas de la Matriz B para la multiplicación.', 'error');
-                return null;
-            }
-            hideMessageBox();
-            const rowsA = A.length;
-            const colsA = A[0].length;
-            const rowsB = B.length;
-            const colsB = B[0].length;
-
-            const result = Array(rowsA).fill(0).map(() => Array(colsB).fill(0));
-
-            for (let i = 0; i < rowsA; i++) {
-                for (let j = 0; j < colsB; j++) {
-                    for (let k = 0; k < colsA; k++) {
-                        result[i][j] += A[i][k] * B[k][j];
-                    }
-                }
-            }
-            return result;
-        }
-
-        // Main function to perform selected operation
-        function performOperation(operationType) {
-            const matrixA = getMatrix('A');
-            let result = null;
-
-            if (operationType === 'scalar') {
-                const scalarValue = parseFloat(document.getElementById('scalarValue').value);
-                result = scalarMultiply(matrixA, scalarValue);
-            } else {
-                const matrixB = getMatrix('B');
-                if (operationType === 'add') {
-                    result = addMatrices(matrixA, matrixB);
-                } else if (operationType === 'subtract') {
-                    result = subtractMatrices(matrixA, matrixB);
-                } else if (operationType === 'multiply') {
-                    result = multiplyMatrices(matrixA, matrixB);
-                }
-            }
-            
-            if (result) {
-                displayMatrix(result, 'resultMatrixDisplay');
-            } else {
-                document.getElementById('resultMatrixDisplay').innerHTML = '<p class="text-light-gray">No se pudo realizar la operación. Verifica las dimensiones y los valores.</p>';
-            }
-        }
-
-        // Initial setup on DOMContentLoaded
-        document.addEventListener('DOMContentLoaded', function() {
-            generateMatrixInputs('A');
-            generateMatrixInputs('B');
-
-            // Set up event listeners for operation buttons to toggle input visibility
-            const scalarInputContainer = document.getElementById('scalarInputContainer');
-            const matrixBControls = document.getElementById('matrixBControls');
-            const matrixBInputs = document.getElementById('matrixBInputs');
-            const matrixBTitle = document.getElementById('matrixBTitle');
-
-            document.querySelectorAll('button[onclick^="performOperation"]').forEach(button => {
-                button.addEventListener('click', (event) => {
-                    const opType = event.target.onclick.toString().match(/performOperation\('(\w+)'\)/)[1];
-                    if (opType === 'scalar') {
-                        scalarInputContainer.classList.remove('hidden');
-                        matrixBControls.classList.add('hidden');
-                        matrixBInputs.classList.add('hidden');
-                        matrixBTitle.textContent = 'Escalar';
+            initializeSizeControls() {
+                const operations = ['suma', 'resta', 'multiplicacion', 'traspuesta'];
+                operations.forEach(op => {
+                    if (op === 'traspuesta') {
+                        ['rows', 'cols'].forEach(dim => {
+                            const input = document.getElementById(`trans-a-${dim}`);
+                            if (input) {
+                                input.addEventListener('change', () => {
+                                    this.updateMatrixGrid(op, 'a');
+                                });
+                            }
+                        });
                     } else {
-                        scalarInputContainer.classList.add('hidden');
-                        matrixBControls.classList.remove('hidden');
-                        matrixBInputs.classList.remove('hidden');
-                        matrixBTitle.textContent = 'Matriz B';
+                        ['a', 'b'].forEach(matrix => {
+                            ['rows', 'cols'].forEach(dim => {
+                                const input = document.getElementById(`${op}-${matrix}-${dim}`);
+                                if (input) {
+                                    input.addEventListener('change', () => {
+                                        this.updateMatrixGrid(op, matrix);
+                                    });
+                                }
+                            });
+                        });
                     }
                 });
-            });
-
-            // Initial display of matrices (though not strictly necessary for this app, good for consistency)
-            // displayMatrix(getMatrix('A'), 'matrixADisplay'); // No dedicated display for input matrices
-            // displayMatrix(getMatrix('B'), 'matrixBDisplay'); // No dedicated display for input matrices
-
-            // Ensure MathJax renders initially
-            if (typeof MathJax !== 'undefined') {
-                MathJax.typesetPromise();
             }
+
+            initializeTheme() {
+                const savedTheme = localStorage.getItem('theme');
+                if (savedTheme === 'dark') {
+                    document.body.classList.add('dark');
+                    document.getElementById('themeToggle').textContent = '☀️ Modo Claro';
+                } else {
+                    document.body.classList.remove('dark');
+                    document.getElementById('themeToggle').textContent = '🌙 Modo Oscuro';
+                }
+            }
+
+            toggleTheme() {
+                const isDark = document.body.classList.toggle('dark');
+                const themeToggle = document.getElementById('themeToggle');
+                
+                if (isDark) {
+                    localStorage.setItem('theme', 'dark');
+                    themeToggle.textContent = '☀️ Modo Claro';
+                } else {
+                    localStorage.setItem('theme', 'light');
+                    themeToggle.textContent = '🌙 Modo Oscuro';
+                }
+            }
+
+            selectOperation(operation) {
+                // Update button states
+                document.querySelectorAll('.operation-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                document.querySelector(`[data-operation="${operation}"]`).classList.add('active');
+
+                // Hide all controls
+                document.querySelectorAll('.matrix-controls').forEach(control => {
+                    control.classList.remove('active');
+                });
+
+                // Show selected operation controls
+                document.getElementById(`${operation}-controls`).classList.add('active');
+
+                this.currentOperation = operation;
+                this.initializeMatrices(operation);
+                document.getElementById('calculate-btn').disabled = false;
+            }
+
+            initializeMatrices(operation) {
+                if (operation === 'traspuesta') {
+                    this.updateMatrixGrid(operation, 'a');
+                } else {
+                    this.updateMatrixGrid(operation, 'a');
+                    this.updateMatrixGrid(operation, 'b');
+                }
+            }
+
+            updateMatrixGrid(operation, matrix) {
+                const rowsInput = document.getElementById(`${operation === 'traspuesta' ? 'trans' : operation}-${matrix}-rows`);
+                const colsInput = document.getElementById(`${operation === 'traspuesta' ? 'trans' : operation}-${matrix}-cols`);
+                const gridContainer = document.getElementById(`${operation === 'traspuesta' ? 'trans' : operation}-matrix-${matrix}`);
+
+                if (!rowsInput || !colsInput || !gridContainer) return;
+
+                const rows = parseInt(rowsInput.value);
+                const cols = parseInt(colsInput.value);
+
+                gridContainer.innerHTML = '';
+                gridContainer.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+
+                for (let i = 0; i < rows; i++) {
+                    for (let j = 0; j < cols; j++) {
+                        const input = document.createElement('input');
+                        input.type = 'number';
+                        input.className = 'matrix-cell';
+                        input.value = '0';
+                        input.dataset.row = i;
+                        input.dataset.col = j;
+                        gridContainer.appendChild(input);
+                    }
+                }
+            }
+
+            getMatrixValues(operation, matrix) {
+                const gridContainer = document.getElementById(`${operation === 'traspuesta' ? 'trans' : operation}-matrix-${matrix}`);
+                const inputs = gridContainer.querySelectorAll('.matrix-cell');
+                const rowsInput = document.getElementById(`${operation === 'traspuesta' ? 'trans' : operation}-${matrix}-rows`);
+                const colsInput = document.getElementById(`${operation === 'traspuesta' ? 'trans' : operation}-${matrix}-cols`);
+
+                const rows = parseInt(rowsInput.value);
+                const cols = parseInt(colsInput.value);
+                const result = [];
+
+                for (let i = 0; i < rows; i++) {
+                    result[i] = [];
+                    for (let j = 0; j < cols; j++) {
+                        const input = Array.from(inputs).find(inp => 
+                            parseInt(inp.dataset.row) === i && parseInt(inp.dataset.col) === j
+                        );
+                        result[i][j] = parseFloat(input.value) || 0;
+                    }
+                }
+
+                return result;
+            }
+
+            calculate() {
+                if (!this.currentOperation) return;
+
+                try {
+                    let result;
+                    switch (this.currentOperation) {
+                        case 'suma':
+                            result = this.addMatrices();
+                            break;
+                        case 'resta':
+                            result = this.subtractMatrices();
+                            break;
+                        case 'multiplicacion':
+                            result = this.multiplyMatrices();
+                            break;
+                        case 'traspuesta':
+                            result = this.transposeMatrix();
+                            break;
+                    }
+
+                    this.displayResult(result);
+                } catch (error) {
+                    this.displayError(error.message);
+                }
+            }
+
+            addMatrices() {
+                const matrixA = this.getMatrixValues('suma', 'a');
+                const matrixB = this.getMatrixValues('suma', 'b');
+
+                if (matrixA.length !== matrixB.length || matrixA[0].length !== matrixB[0].length) {
+                    throw new Error('Las matrices deben tener las mismas dimensiones para la suma');
+                }
+
+                const result = [];
+                for (let i = 0; i < matrixA.length; i++) {
+                    result[i] = [];
+                    for (let j = 0; j < matrixA[i].length; j++) {
+                        result[i][j] = matrixA[i][j] + matrixB[i][j];
+                    }
+                }
+
+                return result;
+            }
+
+            subtractMatrices() {
+                const matrixA = this.getMatrixValues('resta', 'a');
+                const matrixB = this.getMatrixValues('resta', 'b');
+
+                if (matrixA.length !== matrixB.length || matrixA[0].length !== matrixB[0].length) {
+                    throw new Error('Las matrices deben tener las mismas dimensiones para la resta');
+                }
+
+                const result = [];
+                for (let i = 0; i < matrixA.length; i++) {
+                    result[i] = [];
+                    for (let j = 0; j < matrixA[i].length; j++) {
+                        result[i][j] = matrixA[i][j] - matrixB[i][j];
+                    }
+                }
+
+                return result;
+            }
+
+            multiplyMatrices() {
+                const matrixA = this.getMatrixValues('multiplicacion', 'a');
+                const matrixB = this.getMatrixValues('multiplicacion', 'b');
+
+                if (matrixA[0].length !== matrixB.length) {
+                    throw new Error('El número de columnas de la Matriz A debe ser igual al número de filas de la Matriz B');
+                }
+
+                const result = [];
+                for (let i = 0; i < matrixA.length; i++) {
+                    result[i] = [];
+                    for (let j = 0; j < matrixB[0].length; j++) {
+                        result[i][j] = 0;
+                        for (let k = 0; k < matrixA[0].length; k++) {
+                            result[i][j] += matrixA[i][k] * matrixB[k][j];
+                        }
+                    }
+                }
+
+                return result;
+            }
+
+            transposeMatrix() {
+                const matrixA = this.getMatrixValues('traspuesta', 'a');
+                const result = [];
+
+                for (let i = 0; i < matrixA[0].length; i++) {
+                    result[i] = [];
+                    for (let j = 0; j < matrixA.length; j++) {
+                        result[i][j] = matrixA[j][i];
+                    }
+                }
+
+                return result;
+            }
+
+            displayResult(matrix) {
+                const resultDisplay = document.getElementById('result-display');
+                resultDisplay.innerHTML = '';
+
+                const resultContainer = document.createElement('div');
+                resultContainer.className = 'result-matrix';
+                resultContainer.style.gridTemplateColumns = `repeat(${matrix[0].length}, 1fr)`;
+
+                for (let i = 0; i < matrix.length; i++) {
+                    for (let j = 0; j < matrix[i].length; j++) {
+                        const cell = document.createElement('div');
+                        cell.className = 'result-cell';
+                        cell.textContent = matrix[i][j].toFixed(2);
+                        resultContainer.appendChild(cell);
+                    }
+                }
+
+                resultDisplay.appendChild(resultContainer);
+            }
+
+            displayError(message) {
+                const resultDisplay = document.getElementById('result-display');
+                resultDisplay.innerHTML = `<div class="error-message">${message}</div>`;
+            }
+        }
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', () => {
+            new MatrixCalculator();
         });
     </script>
 </body>

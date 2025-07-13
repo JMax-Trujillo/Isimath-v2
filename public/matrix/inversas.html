@@ -3,530 +3,772 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculadora de Matrices Inversas - Álgebra Lineal</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
-    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Calculadora de Matriz Inversa</title>
     <style>
         :root {
-            --midnight-blue: #0f172a;
-            --deep-blue: #1e293b;
-            --navy-blue: #1e3a8a;
-            --electric-blue: #3b82f6;
-            --light-blue: #60a5fa;
-            --pale-blue: #bfdbfe;
-            --dark-gray: #0f172a;
-            --medium-gray: #334155;
-            --light-gray: #94a3b8;
-            --white: #f8fafc;
+            --light-bg-primary: #f8fafc;
+            --section-bg: #ffffff;
+            --section-text: #1e293b;
+            --section-description-text: #64748b;
+            --button-text-color: #475569;
+            --button-border-color: #cbd5e1;
+            --button-hover-bg: #3b82f6;
+            --button-hover-text: #ffffff;
+            --input-bg: #ffffff;
+            --input-border: #e2e8f0;
+            --input-text: #1e293b;
+            --error-color: #ef4444;
+            --success-color: #10b981;
+            --matrix-border: #e2e8f0;
         }
-        
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--midnight-blue);
-            color: var(--white);
+
+        body.dark {
+            --light-bg-primary: #0f172a;
+            --section-bg: #1e293b;
+            --section-text: #f1f5f9;
+            --section-description-text: #94a3b8;
+            --button-text-color: #cbd5e1;
+            --button-border-color: #475569;
+            --button-hover-bg: #3b82f6;
+            --button-hover-text: #ffffff;
+            --input-bg: #334155;
+            --input-border: #475569;
+            --input-text: #f1f5f9;
+            --error-color: #f87171;
+            --success-color: #34d399;
+            --matrix-border: #475569;
+        }
+
+        * {
             margin: 0;
             padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: var(--light-bg-primary);
+            color: var(--section-text);
             min-height: 100vh;
+            padding: 20px;
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
-        
-        .math-display {
-            font-size: 1.1rem;
-            overflow-x: auto;
-            overflow-y: hidden;
-            color: var(--pale-blue);
-        }
-        
-        .formula-card {
-            transition: all 0.3s ease;
-            box-shadow: 0 2px 4px rgba(2, 6, 23, 0.3);
-            overflow: hidden;
-            background-color: var(--deep-blue);
-            border: 1px solid var(--medium-gray);
-            border-radius: 0.75rem;
-        }
-        
-        .formula-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 12px rgba(2, 6, 23, 0.5);
-            border-color: var(--electric-blue);
-        }
-        
-        .content-container {
-            max-width: 95%;
+
+        .container {
+            max-width: 1200px;
             margin: 0 auto;
-            padding: 1rem;
         }
-        
-        /* Modified main-grid for responsive layout */
-        .main-grid {
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: var(--section-text);
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            color: var(--section-description-text);
+        }
+
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--section-bg);
+            border: 2px solid var(--button-border-color);
+            border-radius: 25px;
+            padding: 10px 20px;
+            cursor: pointer;
+            color: var(--button-text-color);
+            font-size: 14px;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .theme-toggle:hover {
+            background-color: var(--button-hover-bg);
+            color: var(--button-hover-text);
+            border-color: var(--button-hover-bg);
+        }
+
+        .main-content {
+            display: flex;
+            gap: 30px;
+            align-items: flex-start;
+        }
+
+        .input-area, .output-area {
+            background: var(--section-bg);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s ease;
+        }
+
+        .input-area {
+            flex: 1;
+        }
+
+        .output-area {
+            flex: 1;
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: var(--section-text);
+        }
+
+        .method-selection {
+            margin-bottom: 25px;
+        }
+
+        .method-buttons {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .method-btn {
+            background: transparent;
+            color: var(--button-text-color);
+            border: 2px solid var(--button-border-color);
+            border-radius: 25px;
+            padding: 12px 24px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .method-btn:hover {
+            background-color: var(--button-hover-bg);
+            color: var(--button-hover-text);
+            border-color: var(--button-hover-bg);
+        }
+
+        .method-btn.active {
+            background-color: var(--button-hover-bg);
+            color: var(--button-hover-text);
+            border-color: var(--button-hover-bg);
+        }
+
+        .matrix-input-section {
+            display: none;
+            margin-top: 25px;
+        }
+
+        .matrix-input-section.active {
+            display: block;
+        }
+
+        .matrix-size-controls {
+            margin-bottom: 20px;
+        }
+
+        .size-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .size-control label {
+            font-weight: 500;
+            color: var(--section-text);
+            min-width: 80px;
+        }
+
+        .size-input {
+            width: 80px;
+            padding: 8px 12px;
+            border: 2px solid var(--input-border);
+            border-radius: 8px;
+            background: var(--input-bg);
+            color: var(--input-text);
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        .size-input:focus {
+            outline: none;
+            border-color: var(--button-hover-bg);
+        }
+
+        .matrix-grid {
             display: grid;
-            grid-template-columns: 1fr; /* Single column for mobile */
-            gap: 1.5rem;
+            gap: 8px;
+            margin-bottom: 20px;
+            justify-items: center;
         }
-        
-        @media (min-width: 1024px) {
-            .main-grid {
-                grid-template-columns: 1fr 1fr; /* Two columns for desktop */
-            }
-        }
-        
-        .content-card {
-            background-color: var(--deep-blue);
-            box-shadow: 0 2px 4px rgba(2, 6, 23, 0.3);
-            border: 1px solid var(--medium-gray);
-            border-radius: 0.75rem;
-        }
-        
-        .title-accent {
-            position: relative;
-            display: inline-block;
-        }
-        
-        .title-accent::after {
-            content: "";
-            position: absolute;
-            bottom: -8px;
-            left: 0;
-            width: 50%;
-            height: 3px;
-            background: linear-gradient(90deg, var(--electric-blue), transparent);
-            border-radius: 3px;
-        }
-        
-        .text-primary {
-            color: var(--white);
-        }
-        
-        .text-secondary {
-            color: var(--light-gray);
-        }
-        
-        .bg-light {
-            background-color: rgba(30, 41, 59, 0.7);
-            border: 1px solid var(--medium-gray);
-        }
-        
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
-        
-        ::-webkit-scrollbar-track {
-            background: var(--midnight-blue);
-        }
-        
-        ::-webkit-scrollbar-thumb {
-            background: var(--navy-blue);
+
+        .matrix-cell {
+            width: 60px;
+            height: 40px;
+            border: 1px solid var(--matrix-border);
             border-radius: 4px;
-        }
-        
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--electric-blue);
-        }
-        
-        input[type="number"]::-webkit-outer-spin-button,
-        input[type="number"]::-webkit-inner-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
+            background: var(--input-bg);
+            color: var(--input-text);
+            text-align: center;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
         }
 
-        .matrix-input-grid {
-            display: grid;
-            gap: 0.5rem;
+        .matrix-cell:focus {
+            outline: none;
+            border-color: var(--button-hover-bg);
         }
 
-        .matrix-input-grid input {
+        .calculate-btn {
+            background: var(--button-hover-bg);
+            color: var(--button-hover-text);
+            border: none;
+            border-radius: 25px;
+            padding: 15px 30px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
             width: 100%;
-            padding: 0.5rem;
-            background-color: var(--dark-gray);
-            border: 1px solid var(--medium-gray);
-            border-radius: 0.25rem;
-            color: var(--white);
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .calculate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+
+        .calculate-btn:disabled {
+            background: var(--button-border-color);
+            color: var(--section-description-text);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .result-display {
+            margin-top: 20px;
+        }
+
+        .result-matrix {
+            display: grid;
+            gap: 8px;
+            justify-items: center;
+            margin-top: 15px;
+        }
+
+        .result-cell {
+            width: 80px;
+            height: 40px;
+            border: 1px solid var(--matrix-border);
+            border-radius: 4px;
+            background: var(--section-bg);
+            color: var(--section-text);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .error-message {
+            color: var(--error-color);
+            background: rgba(239, 68, 68, 0.1);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            font-weight: 500;
             text-align: center;
         }
 
-        .matrix-display-area {
-            min-height: 100px;
-            background-color: var(--dark-gray);
-            border: 1px solid var(--medium-gray);
-            border-radius: 0.5rem;
-            padding: 1rem;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            overflow-x: auto;
+        .success-message {
+            color: var(--success-color);
+            background: rgba(16, 185, 129, 0.1);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            font-weight: 500;
+            text-align: center;
         }
 
-        .message-box {
-            background-color: var(--navy-blue);
-            color: var(--white);
-            padding: 1rem;
-            border-radius: 0.5rem;
-            margin-top: 1rem;
-            display: none; /* Hidden by default */
-            border: 1px solid var(--electric-blue);
+        .method-info {
+            background: rgba(59, 130, 246, 0.1);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            color: var(--section-description-text);
+            font-size: 14px;
+            line-height: 1.5;
         }
-        .message-box.active {
-            display: block;
+
+        @media (max-width: 768px) {
+            .main-content {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .input-area, .output-area {
+                padding: 20px;
+            }
+
+            .method-buttons {
+                flex-direction: column;
+            }
+
+            .method-btn {
+                min-width: auto;
+            }
+
+            .matrix-cell {
+                width: 50px;
+                height: 35px;
+                font-size: 12px;
+            }
+
+            .result-cell {
+                width: 60px;
+                height: 35px;
+                font-size: 12px;
+            }
+
+            .theme-toggle {
+                position: static;
+                margin-bottom: 20px;
+                width: fit-content;
+                margin-left: auto;
+                margin-right: auto;
+                display: block;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+
+            .header h1 {
+                font-size: 1.8rem;
+            }
+
+            .input-area, .output-area {
+                padding: 15px;
+            }
+
+            .matrix-cell {
+                width: 45px;
+                height: 30px;
+                font-size: 11px;
+            }
+
+            .result-cell {
+                width: 50px;
+                height: 30px;
+                font-size: 11px;
+            }
+        }
+        .app__hidden {
+            display: none;
         }
     </style>
 </head>
 <body>
-    <!-- Main Content -->
-    <div class="content-container py-8">
-        <!-- Title moved here -->
-        <h1 class="text-4xl md:text-5xl font-bold font-poppins mb-8 text-center title-accent">CALCULADORA DE MATRICES INVERSAS</h1>
+    <div class="container">
+        <button class="theme-toggle app__hidden" id="theme-toggle">🌙 Modo Oscuro</button>
         
-        <div class="main-grid">
-            <!-- Left Column: Input and Controls -->
-            <div>
-                <section class="mb-6 content-card shadow-sm p-6">
-                    <h2 class="text-2xl font-bold font-poppins text-primary mb-6 flex items-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2 text-electric-blue" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-                        </svg>
-                        <span class="title-accent">Definir Matriz Cuadrada</span>
-                    </h2>
+        <div class="header">
+            <h1>Calculadora de Matriz Inversa</h1>
+            <p>Calcula la inversa de una matriz cuadrada usando diferentes métodos</p>
+        </div>
+
+        <div class="main-content">
+            <div class="input-area" id="input-area">
+                <h2 class="section-title">Entrada</h2>
+                
+                <div class="method-selection">
+                    <h3 style="margin-bottom: 15px; color: var(--section-text);">Selecciona el método:</h3>
+                    <div class="method-buttons">
+                        <button class="method-btn" data-method="gauss-jordan">Gauss-Jordan</button>
+                        <button class="method-btn" data-method="adjoint">Adjunta</button>
+                    </div>
+                </div>
+
+                <div class="matrix-input-section" id="matrix-input">
+                    <div class="matrix-size-controls">
+                        <div class="size-control">
+                            <label for="matrix-size">Tamaño:</label>
+                            <input type="number" id="matrix-size" class="size-input" min="2" max="6" value="3">
+                            <span style="color: var(--section-description-text);">x</span>
+                            <span id="size-display" style="color: var(--section-description-text);">3</span>
+                        </div>
+                    </div>
+
+                    <div class="matrix-grid" id="matrix-grid"></div>
+
+                    <button class="calculate-btn" id="calculate-btn" disabled>Calcular Inversa</button>
                     
-                    <!-- Matrix Input -->
-                    <div class="bg-dark-gray rounded-xl overflow-hidden border border-medium-gray p-6 mb-6">
-                        <h3 class="text-xl font-semibold text-primary mb-4">Matriz A</h3>
-                        <div class="flex items-center space-x-4 mb-4">
-                            <label for="matrixSize" class="text-light-gray">Tamaño (n x n):</label>
-                            <input type="number" id="matrixSize" value="3" min="2" max="4" class="w-20 p-2 rounded-md bg-medium-gray text-white border border-medium-gray" onchange="generateMatrixInputs()">
-                        </div>
-                        <div id="matrixAInputs" class="matrix-input-grid"></div>
-                    </div>
-
-                    <!-- Operation Method Selection -->
-                    <div class="bg-dark-gray rounded-xl overflow-hidden border border-medium-gray p-6 mb-6">
-                        <h3 class="text-xl font-semibold text-primary mb-4">Seleccionar Método de Cálculo</h3>
-                        <div class="flex flex-wrap justify-center gap-4">
-                            <button id="gaussJordanBtn" class="bg-electric-blue hover:bg-light-blue text-white font-bold py-3 px-6 rounded-lg transition duration-200" onclick="calculateInverse('gaussJordan')">
-                                Gauss-Jordan
-                            </button>
-                            <button id="adjointBtn" class="bg-electric-blue hover:bg-light-blue text-white font-bold py-3 px-6 rounded-lg transition duration-200" onclick="calculateInverse('adjoint')">
-                                Método de la Adjunta (2x2, 3x3)
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Message Box for Errors/Info -->
-                    <div id="messageBox" class="message-box"></div>
-                </section>
+                    <div class="method-info" id="method-info"></div>
+                </div>
             </div>
-            
-            <!-- Right Column: Result Display and Formulas -->
-            <div>
-                <section class="mb-8 content-card shadow-sm p-6">
-                    <h2 class="text-2xl font-bold font-poppins text-primary mb-6 flex items-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2 text-electric-blue" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                        </svg>
-                        <span class="title-accent">Matriz Inversa ($$A^{-1}$$)</span>
-                    </h2>
-                    <div id="resultMatrixDisplay" class="matrix-display-area text-center">
-                        <p class="text-light-gray">La matriz inversa aparecerá aquí.</p>
-                    </div>
-                </section>
 
-                <!-- Formulas Section -->
-                <section class="mb-8 content-card shadow-sm p-6">
-                    <h2 class="text-2xl font-bold font-poppins text-primary mb-6 flex items-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2 text-electric-blue" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                        </svg>
-                        <span class="title-accent">Fórmulas Esenciales</span>
-                    </h2>
-                    
-                    <div class="space-y-4">
-                        <div class="formula-card p-4">
-                            <h3 class="font-semibold text-primary mb-2">Definición de Inversa</h3>
-                            <div class="text-center my-2 math-display text-pale-blue">$$A A^{-1} = A^{-1} A = I$$</div>
-                            <p class="text-sm text-light-gray">Donde \(I\) es la matriz identidad.</p>
-                        </div>
-                        
-                        <div class="formula-card p-4">
-                            <h3 class="font-semibold text-primary mb-2">Método de la Adjunta</h3>
-                            <div class="text-center my-2 math-display text-pale-blue">$$A^{-1} = \frac{1}{\det(A)} \text{adj}(A)$$</div>
-                            <p class="text-sm text-light-gray">Necesita \( \det(A) \neq 0 \).</p>
-                        </div>
-
-                        <div class="formula-card p-4">
-                            <h3 class="font-semibold text-primary mb-2">Gauss-Jordan</h3>
-                            <div class="text-center my-2 math-display text-pale-blue">$$[A | I] \xrightarrow{\text{operaciones fila}} [I | A^{-1}]$$</div>
-                            <p class="text-sm text-light-gray">Transforma \(A\) en identidad, \(I\) se convierte en \(A^{-1}\).</p>
-                        </div>
-                    </div>
-                </section>
+            <div class="output-area" id="output-area">
+                <h2 class="section-title">Resultado</h2>
+                <div class="result-display" id="result-display">
+                    <p style="color: var(--section-description-text); text-align: center; margin-top: 50px;">
+                        Selecciona un método e ingresa una matriz para ver el resultado
+                    </p>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
-        // Helper function for rounding to avoid floating point inaccuracies
-        function round(value, decimals = 10) {
-            return Number(Math.round(value + 'e' + decimals) + 'e-' + decimals);
-        }
-
-        // Function to generate matrix input fields based on size
-        function generateMatrixInputs() {
-            const sizeInput = document.getElementById('matrixSize');
-            const container = document.getElementById('matrixAInputs');
-            const size = parseInt(sizeInput.value);
-
-            // Validate size input
-            if (isNaN(size) || size < 2 || size > 4) { // Max size 4 for this app
-                container.innerHTML = '<p class="text-red-400">Por favor, introduce un tamaño válido (entre 2 y 4).</p>';
-                document.getElementById('gaussJordanBtn').disabled = true;
-                document.getElementById('adjointBtn').disabled = true;
-                return;
+        class MatrixInverseCalculator {
+            constructor() {
+                this.currentMethod = null;
+                this.matrixSize = 3;
+                this.matrix = [];
+                this.initializeElements();
+                this.setupEventListeners();
+                this.initializeTheme();
             }
 
-            container.innerHTML = ''; // Clear previous inputs
-            container.style.gridTemplateColumns = `repeat(${size}, minmax(0, 1fr))`;
-
-            // Enable/disable Adjoint button based on size
-            document.getElementById('adjointBtn').disabled = (size > 3); // Adjoint only for 2x2 and 3x3
-            document.getElementById('gaussJordanBtn').disabled = false; // Gauss-Jordan for all sizes 2-4
-
-            for (let i = 0; i < size; i++) {
-                for (let j = 0; j < size; j++) {
-                    const input = document.createElement('input');
-                    input.type = 'number';
-                    input.value = '0'; // Default value
-                    input.id = `matrixA-${i}-${j}`;
-                    input.classList.add('p-2', 'rounded-md', 'bg-medium-gray', 'text-white', 'border', 'border-medium-gray', 'text-center');
-                    container.appendChild(input);
-                }
-            }
-        }
-
-        // Function to get matrix values from input fields
-        function getMatrix() {
-            const size = parseInt(document.getElementById('matrixSize').value);
-            const matrix = [];
-
-            for (let i = 0; i < size; i++) {
-                const row = [];
-                for (let j = 0; j < size; j++) {
-                    const input = document.getElementById(`matrixA-${i}-${j}`);
-                    row.push(parseFloat(input.value || '0')); // Default to 0 if empty or invalid
-                }
-                matrix.push(row);
-            }
-            return matrix;
-        }
-
-        // Function to display a message in the message box
-        function showMessage(message, type = 'info') {
-            const messageBox = document.getElementById('messageBox');
-            messageBox.textContent = message;
-            messageBox.classList.remove('bg-navy-blue', 'bg-red-700', 'border-electric-blue', 'border-red-500');
-            messageBox.classList.add('active');
-
-            if (type === 'error') {
-                messageBox.classList.add('bg-red-700', 'border-red-500');
-            } else {
-                messageBox.classList.add('bg-navy-blue', 'border-electric-blue');
-            }
-        }
-
-        // Function to hide the message box
-        function hideMessageBox() {
-            document.getElementById('messageBox').classList.remove('active');
-        }
-
-        // Function to display a matrix using MathJax
-        function displayMatrix(matrix, elementId) {
-            const displayElement = document.getElementById(elementId);
-            if (!matrix || matrix.length === 0 || matrix[0].length === 0) {
-                displayElement.innerHTML = '<p class="text-light-gray">Matriz vacía o inválida.</p>';
-                if (typeof MathJax !== 'undefined') MathJax.typesetPromise([displayElement]);
-                return;
+            initializeElements() {
+                this.methodButtons = document.querySelectorAll('.method-btn');
+                this.matrixInput = document.getElementById('matrix-input');
+                this.matrixSizeInput = document.getElementById('matrix-size');
+                this.sizeDisplay = document.getElementById('size-display');
+                this.matrixGrid = document.getElementById('matrix-grid');
+                this.calculateBtn = document.getElementById('calculate-btn');
+                this.resultDisplay = document.getElementById('result-display');
+                this.methodInfo = document.getElementById('method-info');
+                this.themeToggle = document.getElementById('theme-toggle');
             }
 
-            let mathJaxString = '\\begin{bmatrix}';
-            for (let i = 0; i < matrix.length; i++) {
-                mathJaxString += matrix[i].map(val => round(val)).join(' & '); // Round values for display
-                if (i < matrix.length - 1) {
-                    mathJaxString += ' \\\\ ';
-                }
-            }
-            mathJaxString += '\\end{bmatrix}';
+            setupEventListeners() {
+                this.methodButtons.forEach(btn => {
+                    btn.addEventListener('click', () => this.selectMethod(btn.dataset.method));
+                });
 
-            displayElement.innerHTML = `$$${mathJaxString}$$`;
-            if (typeof MathJax !== 'undefined') MathJax.typesetPromise([displayElement]);
-        }
-
-        // --- Determinant Calculation (reused from previous app) ---
-        function determinant(matrix) {
-            const n = matrix.length;
-
-            if (n === 1) {
-                return matrix[0][0];
-            }
-            if (n === 2) {
-                return (matrix[0][0] * matrix[1][1]) - (matrix[0][1] * matrix[1][0]);
+                this.matrixSizeInput.addEventListener('input', () => this.updateMatrixSize());
+                this.calculateBtn.addEventListener('click', () => this.calculateInverse());
+                this.themeToggle.addEventListener('click', () => this.toggleTheme());
             }
 
-            let det = 0;
-            for (let j = 0; j < n; j++) {
-                const submatrix = getSubmatrix(matrix, 0, j);
-                const sign = (j % 2 === 0) ? 1 : -1;
-                det += sign * matrix[0][j] * determinant(submatrix);
-            }
-            return det;
-        }
-
-        function getSubmatrix(matrix, rowToRemove, colToRemove) {
-            return matrix.filter((row, i) => i !== rowToRemove)
-                         .map(row => row.filter((val, j) => j !== colToRemove));
-        }
-
-        // --- Matrix Inversion Methods ---
-
-        // Method 1: Gauss-Jordan Elimination
-        function gaussJordanInverse(matrix) {
-            const n = matrix.length;
-            const augmentedMatrix = [];
-
-            // Create augmented matrix [A | I]
-            for (let i = 0; i < n; i++) {
-                augmentedMatrix[i] = [];
-                for (let j = 0; j < n; j++) {
-                    augmentedMatrix[i][j] = matrix[i][j];
-                }
-                for (let j = 0; j < n; j++) {
-                    augmentedMatrix[i][j + n] = (i === j) ? 1 : 0;
+            initializeTheme() {
+                const savedTheme = localStorage.getItem('theme');
+                if (savedTheme === 'dark') {
+                    document.body.classList.add('dark');
+                    this.themeToggle.textContent = '☀️ Modo Claro';
+                } else {
+                    document.body.classList.remove('dark');
+                    this.themeToggle.textContent = '🌙 Modo Oscuro';
                 }
             }
 
-            // Apply Gauss-Jordan elimination
-            for (let i = 0; i < n; i++) {
-                // Find pivot
-                let pivotRow = i;
-                for (let k = i + 1; k < n; k++) {
-                    if (Math.abs(augmentedMatrix[k][i]) > Math.abs(augmentedMatrix[pivotRow][i])) {
-                        pivotRow = k;
+            toggleTheme() {
+                document.body.classList.toggle('dark');
+                const isDark = document.body.classList.contains('dark');
+                localStorage.setItem('theme', isDark ? 'dark' : 'light');
+                this.themeToggle.textContent = isDark ? '☀️ Modo Claro' : '🌙 Modo Oscuro';
+            }
+
+            selectMethod(method) {
+                this.currentMethod = method;
+                
+                this.methodButtons.forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                
+                document.querySelector(`[data-method="${method}"]`).classList.add('active');
+                this.matrixInput.classList.add('active');
+                
+                this.updateMethodInfo();
+                this.generateMatrixGrid();
+            }
+
+            updateMethodInfo() {
+                const info = {
+                    'gauss-jordan': 'El método de Gauss-Jordan utiliza eliminación gaussiana para transformar la matriz aumentada [A|I] en [I|A⁻¹].',
+                    'adjoint': 'El método de la adjunta calcula la inversa usando A⁻¹ = (1/det(A)) × adj(A), donde adj(A) es la matriz adjunta.'
+                };
+                
+                this.methodInfo.textContent = info[this.currentMethod] || '';
+            }
+
+            updateMatrixSize() {
+                const newSize = parseInt(this.matrixSizeInput.value);
+                if (newSize >= 2 && newSize <= 6) {
+                    this.matrixSize = newSize;
+                    this.sizeDisplay.textContent = newSize;
+                    this.generateMatrixGrid();
+                }
+            }
+
+            generateMatrixGrid() {
+                this.matrixGrid.innerHTML = '';
+                this.matrixGrid.style.gridTemplateColumns = `repeat(${this.matrixSize}, 1fr)`;
+                
+                this.matrix = [];
+                for (let i = 0; i < this.matrixSize; i++) {
+                    this.matrix[i] = [];
+                    for (let j = 0; j < this.matrixSize; j++) {
+                        const input = document.createElement('input');
+                        input.type = 'number';
+                        input.step = '0.1';
+                        input.className = 'matrix-cell';
+                        input.placeholder = '0';
+                        input.addEventListener('input', () => this.updateMatrix(i, j, input.value));
+                        this.matrixGrid.appendChild(input);
+                        this.matrix[i][j] = 0;
                     }
                 }
-                [augmentedMatrix[i], augmentedMatrix[pivotRow]] = [augmentedMatrix[pivotRow], augmentedMatrix[i]];
+                
+                this.checkMatrixValidity();
+            }
 
-                let pivot = augmentedMatrix[i][i];
-                if (Math.abs(pivot) < 1e-9) { // Check for singular matrix (pivot is close to zero)
-                    showMessage('Error: La matriz es singular (determinante cero), no tiene inversa.', 'error');
-                    return null;
+            updateMatrix(row, col, value) {
+                this.matrix[row][col] = parseFloat(value) || 0;
+                this.checkMatrixValidity();
+            }
+
+            checkMatrixValidity() {
+                const det = this.calculateDeterminant(this.matrix);
+                const isValid = Math.abs(det) > 1e-10;
+                
+                this.calculateBtn.disabled = !isValid;
+                
+                if (!isValid && this.hasNonZeroValues()) {
+                    this.showError('La matriz no es invertible (determinante = 0)');
+                } else if (isValid) {
+                    this.clearMessages();
                 }
+            }
 
-                // Normalize row
-                for (let j = i; j < 2 * n; j++) {
-                    augmentedMatrix[i][j] /= pivot;
-                }
+            hasNonZeroValues() {
+                return this.matrix.some(row => row.some(val => Math.abs(val) > 1e-10));
+            }
 
-                // Eliminate other rows
-                for (let k = 0; k < n; k++) {
-                    if (k !== i) {
-                        let factor = augmentedMatrix[k][i];
-                        for (let j = i; j < 2 * n; j++) {
-                            augmentedMatrix[k][j] -= factor * augmentedMatrix[i][j];
+            calculateDeterminant(matrix) {
+                const n = matrix.length;
+                if (n === 1) return matrix[0][0];
+                if (n === 2) return matrix[0][0] * matrix[1][1] - matrix[0][1] * matrix[1][0];
+                
+                // Create a copy for LU decomposition
+                const A = matrix.map(row => [...row]);
+                let det = 1;
+                
+                for (let i = 0; i < n; i++) {
+                    let maxRow = i;
+                    for (let k = i + 1; k < n; k++) {
+                        if (Math.abs(A[k][i]) > Math.abs(A[maxRow][i])) {
+                            maxRow = k;
+                        }
+                    }
+                    
+                    if (maxRow !== i) {
+                        [A[i], A[maxRow]] = [A[maxRow], A[i]];
+                        det = -det;
+                    }
+                    
+                    if (Math.abs(A[i][i]) < 1e-10) return 0;
+                    
+                    det *= A[i][i];
+                    
+                    for (let k = i + 1; k < n; k++) {
+                        const factor = A[k][i] / A[i][i];
+                        for (let j = i; j < n; j++) {
+                            A[k][j] -= factor * A[i][j];
                         }
                     }
                 }
+                
+                return det;
             }
 
-            // Extract the inverse matrix
-            const inverseMatrix = [];
-            for (let i = 0; i < n; i++) {
-                inverseMatrix[i] = [];
-                for (let j = 0; j < n; j++) {
-                    inverseMatrix[i][j] = augmentedMatrix[i][j + n];
+            calculateInverse() {
+                if (!this.currentMethod) return;
+                
+                let inverse;
+                if (this.currentMethod === 'gauss-jordan') {
+                    inverse = this.gaussJordanInverse();
+                } else {
+                    inverse = this.adjointInverse();
+                }
+                
+                if (inverse) {
+                    this.displayResult(inverse);
                 }
             }
-            return inverseMatrix;
+
+            gaussJordanInverse() {
+                const n = this.matrixSize;
+                const augmented = [];
+                
+                // Create augmented matrix [A|I]
+                for (let i = 0; i < n; i++) {
+                    augmented[i] = [];
+                    for (let j = 0; j < n; j++) {
+                        augmented[i][j] = this.matrix[i][j];
+                    }
+                    for (let j = 0; j < n; j++) {
+                        augmented[i][n + j] = i === j ? 1 : 0;
+                    }
+                }
+                
+                // Gauss-Jordan elimination
+                for (let i = 0; i < n; i++) {
+                    // Find pivot
+                    let maxRow = i;
+                    for (let k = i + 1; k < n; k++) {
+                        if (Math.abs(augmented[k][i]) > Math.abs(augmented[maxRow][i])) {
+                            maxRow = k;
+                        }
+                    }
+                    
+                    // Swap rows
+                    if (maxRow !== i) {
+                        [augmented[i], augmented[maxRow]] = [augmented[maxRow], augmented[i]];
+                    }
+                    
+                    // Make diagonal element 1
+                    const pivot = augmented[i][i];
+                    if (Math.abs(pivot) < 1e-10) {
+                        this.showError('La matriz no es invertible');
+                        return null;
+                    }
+                    
+                    for (let j = 0; j < 2 * n; j++) {
+                        augmented[i][j] /= pivot;
+                    }
+                    
+                    // Eliminate column
+                    for (let k = 0; k < n; k++) {
+                        if (k !== i) {
+                            const factor = augmented[k][i];
+                            for (let j = 0; j < 2 * n; j++) {
+                                augmented[k][j] -= factor * augmented[i][j];
+                            }
+                        }
+                    }
+                }
+                
+                // Extract inverse matrix
+                const inverse = [];
+                for (let i = 0; i < n; i++) {
+                    inverse[i] = [];
+                    for (let j = 0; j < n; j++) {
+                        inverse[i][j] = augmented[i][n + j];
+                    }
+                }
+                
+                return inverse;
+            }
+
+            adjointInverse() {
+                const det = this.calculateDeterminant(this.matrix);
+                if (Math.abs(det) < 1e-10) {
+                    this.showError('La matriz no es invertible (determinante = 0)');
+                    return null;
+                }
+                
+                const n = this.matrixSize;
+                const adjoint = this.calculateAdjoint();
+                
+                // Divide adjoint by determinant
+                const inverse = [];
+                for (let i = 0; i < n; i++) {
+                    inverse[i] = [];
+                    for (let j = 0; j < n; j++) {
+                        inverse[i][j] = adjoint[i][j] / det;
+                    }
+                }
+                
+                return inverse;
+            }
+
+            calculateAdjoint() {
+                const n = this.matrixSize;
+                const adjoint = [];
+                
+                for (let i = 0; i < n; i++) {
+                    adjoint[i] = [];
+                    for (let j = 0; j < n; j++) {
+                        const minor = this.getMinor(i, j);
+                        const cofactor = Math.pow(-1, i + j) * this.calculateDeterminant(minor);
+                        adjoint[j][i] = cofactor; // Transpose while calculating
+                    }
+                }
+                
+                return adjoint;
+            }
+
+            getMinor(excludeRow, excludeCol) {
+                const n = this.matrixSize;
+                const minor = [];
+                
+                for (let i = 0; i < n; i++) {
+                    if (i === excludeRow) continue;
+                    const row = [];
+                    for (let j = 0; j < n; j++) {
+                        if (j === excludeCol) continue;
+                        row.push(this.matrix[i][j]);
+                    }
+                    minor.push(row);
+                }
+                
+                return minor;
+            }
+
+            displayResult(inverse) {
+                const resultHtml = `
+                    <div class="success-message">
+                        ¡Matriz inversa calculada exitosamente usando ${this.currentMethod === 'gauss-jordan' ? 'Gauss-Jordan' : 'método de la adjunta'}!
+                    </div>
+                    <div class="result-matrix" id="result-matrix"></div>
+                `;
+                
+                this.resultDisplay.innerHTML = resultHtml;
+                
+                const resultMatrix = document.getElementById('result-matrix');
+                resultMatrix.style.gridTemplateColumns = `repeat(${this.matrixSize}, 1fr)`;
+                
+                for (let i = 0; i < this.matrixSize; i++) {
+                    for (let j = 0; j < this.matrixSize; j++) {
+                        const cell = document.createElement('div');
+                        cell.className = 'result-cell';
+                        cell.textContent = inverse[i][j].toFixed(4);
+                        resultMatrix.appendChild(cell);
+                    }
+                }
+            }
+
+            showError(message) {
+                this.resultDisplay.innerHTML = `<div class="error-message">${message}</div>`;
+            }
+
+            clearMessages() {
+                if (this.resultDisplay.innerHTML.includes('error-message')) {
+                    this.resultDisplay.innerHTML = '<p style="color: var(--section-description-text); text-align: center; margin-top: 50px;">Ingresa una matriz válida para ver el resultado</p>';
+                }
+            }
         }
 
-        // Method 2: Adjoint Method
-        function adjointInverse(matrix) {
-            const n = matrix.length;
-
-            if (n !== 2 && n !== 3) {
-                showMessage('Error: El método de la Adjunta solo es práctico para matrices 2x2 y 3x3.', 'error');
-                return null;
-            }
-
-            const detA = determinant(matrix);
-            if (Math.abs(detA) < 1e-9) { // Check for singular matrix
-                showMessage('Error: La matriz es singular (determinante cero), no tiene inversa.', 'error');
-                return null;
-            }
-
-            // Calculate matrix of cofactors
-            const cofactorMatrix = Array(n).fill(0).map(() => Array(n).fill(0));
-            for (let i = 0; i < n; i++) {
-                for (let j = 0; j < n; j++) {
-                    const sub = getSubmatrix(matrix, i, j);
-                    const sign = ((i + j) % 2 === 0) ? 1 : -1;
-                    cofactorMatrix[i][j] = sign * determinant(sub);
-                }
-            }
-
-            // Transpose the cofactor matrix to get the adjoint
-            const adjointMatrix = Array(n).fill(0).map(() => Array(n).fill(0));
-            for (let i = 0; i < n; i++) {
-                for (let j = 0; j < n; j++) {
-                    adjointMatrix[j][i] = cofactorMatrix[i][j]; // Transpose
-                }
-            }
-
-            // Divide adjoint by determinant
-            const inverse = Array(n).fill(0).map(() => Array(n).fill(0));
-            for (let i = 0; i < n; i++) {
-                for (let j = 0; j < n; j++) {
-                    inverse[i][j] = adjointMatrix[i][j] / detA;
-                }
-            }
-            return inverse;
-        }
-
-        // Main function to calculate inverse based on selected method
-        function calculateInverse(method) {
-            const matrix = getMatrix();
-            const size = matrix.length;
-
-            // Basic validation for square matrix
-            if (size === 0 || matrix[0].length !== size) {
-                showMessage('Error: La matriz debe ser cuadrada (n x n) y no vacía.', 'error');
-                displayMatrix(null, 'resultMatrixDisplay');
-                return;
-            }
-
-            hideMessageBox(); // Clear any previous messages
-
-            let result = null;
-            if (method === 'gaussJordan') {
-                result = gaussJordanInverse(matrix);
-            } else if (method === 'adjoint') {
-                result = adjointInverse(matrix);
-            }
-            
-            if (result) {
-                displayMatrix(result, 'resultMatrixDisplay');
-            } else {
-                document.getElementById('resultMatrixDisplay').innerHTML = '<p class="text-light-gray">No se pudo calcular la inversa. Verifica las dimensiones y si la matriz es singular.</p>';
-            }
-        }
-
-        // Initial setup on DOMContentLoaded
-        document.addEventListener('DOMContentLoaded', function() {
-            generateMatrixInputs(); // Generate inputs for initial 3x3 matrix
-            
-            // Ensure MathJax renders initially
-            if (typeof MathJax !== 'undefined') {
-                MathJax.typesetPromise();
-            }
+        // Initialize the calculator when the DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            new MatrixInverseCalculator();
         });
     </script>
 </body>
