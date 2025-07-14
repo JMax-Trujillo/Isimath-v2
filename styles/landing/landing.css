@@ -830,7 +830,7 @@ body.dark {
         }
 
         .testimony__video {
-            width: 400px;
+            width: 200px;
         }
 
         @media (min-width: 769px) and (max-width: 1024px) {
@@ -840,4 +840,29 @@ body.dark {
             .footer__brand {
                 grid-column: span 2;
             }
+        }
+
+        .horizontal-scroll {
+            display: flex;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+            padding: 30px 20px;
+            gap: 30px;
+            margin: 0 -20px;
+        }
+
+        .horizontal-scroll::-webkit-scrollbar {
+            height: 8px;
+        }
+
+        .horizontal-scroll::-webkit-scrollbar-track {
+            background: rgba(100, 255, 218, 0.1);
+            border-radius: 10px;
+        }
+
+        .horizontal-scroll::-webkit-scrollbar-thumb {
+            background: var(--accent);
+            border-radius: 10px;
         }
