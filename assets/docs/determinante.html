@@ -518,6 +518,12 @@
     </div>
 
     <script>
+        const darkMode = localStorage.getItem("theme");
+
+if (darkMode === "dark") {
+    // Aplica clase al body para activar modo oscuro
+    document.body.classList.add("dark");
+}
         // Tab functionality
         function openExampleTab(exampleId, tabId) {
     // Hide all tab contents for this example
