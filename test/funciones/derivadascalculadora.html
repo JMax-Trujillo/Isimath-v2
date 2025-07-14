@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ISIMath - Derivadas</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.11.0/math.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/12.4.0/math.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/2.26.0/plotly.min.js"></script>
     <script src="https://unpkg.com/mathlive" defer></script>
     <link rel="stylesheet" href="https://unpkg.com/mathlive@0.95.0/dist/mathlive-static.css">
@@ -892,7 +892,48 @@
 
             // Función para normalizar la entrada
             const normalizeInput = (input) => {
-                let normalized = input
+                let normalized = input;
+
+                // Remove \text{} wrappers first to expose raw function names/variables
+                normalized = normalized.replace(/\\text\{([^}]+)\}/g, '$1');
+
+                // Prioritize conversion of 'ln' and 'In' to 'log'
+                normalized = normalized.replace(/\\ln/g, 'log').replace(/ln/g, 'log');
+                normalized = normalized.replace(/In/g, 'log'); // Handle 'In' as a typo for 'ln'
+
+                // Handle \log_{base}{arg} or \log_{base}arg (where arg is not in parentheses)
+                // This covers cases like \log_{10}x or \log_{2}(x+1)
+                // Escaped characters in character class: \s, (, ), *, /, ^, ,, +, -
+                // The hyphen is placed at the end of the character class to avoid range issues.
+                const logBaseRegex = /\\log_\{([0-9]+)\}([^\\s()\*\/\\^,+-]+|\([^)]+\)|\{[^}]+\})/g;
+                normalized = normalized.replace(logBaseRegex, (match, base, arg) => {
+                    // Clean up braces if present
+                    arg = arg.replace(/\{([^}]+)\}/g, '$1');
+                    // Ensure arg is wrapped in parentheses if it's not already
+                    if (!arg.startsWith('(') && !arg.endsWith(')')) {
+                        arg = `(${arg})`;
+                    }
+                    return `log(${arg}, ${base})`;
+                });
+
+                // Handle \log{arg} or \log arg (without base, assumed base 10 as per instructions)
+                // This targets cases like \log x, \log(x), \log{x}
+                // It should be applied AFTER base-specific logs
+                const logNoBaseRegex = /\\log\s*([^{(\s]+|\{[^}]+\}|(\([^)]+\)))/g;
+                normalized = normalized.replace(logNoBaseRegex, (match, arg) => {
+                    // arg might be 'x', '{x}', '(x+1)'
+                    // Clean up braces if present
+                    arg = arg.replace(/\{([^}]+)\}/g, '$1');
+                    // Ensure arg is wrapped in parentheses if it's not already
+                    if (!arg.startsWith('(') && !arg.endsWith(')')) {
+                        arg = `(${arg})`;
+                    }
+                    return `log(${arg}, 10)`;
+                });
+
+
+                // Now apply other replacements
+                normalized = normalized
                     .replace(/\\cdot/g, '*')
                     .replace(/\\left\(/g, '(')
                     .replace(/\\right\)/g, ')')
@@ -904,16 +945,16 @@
                     .replace(/\\csc\(([^)]+)\)/g, '(1/sin($1))')
                     .replace(/\\cot\(([^)]+)\)/g, '(cos($1)/sin($1))')
                     .replace(/\\exp/g, 'exp') // Math.js usa 'exp' para e^x
-                    .replace(/\\log_\{([0-9]+)\}\(([^)]+)\)/g, 'log($2, $1)') // Para logaritmos con base
-                    .replace(/\\log\(([^)]+)\)/g, 'log($1, 10)') // log sin base es base 10
                     .replace(/\\sqrt{([^}]+)}/g, 'sqrt($1)')
-                    .replace(/\\frac{([^}]+)}{([^}]+)}/g, '($1)/($2)')
+                    .replace(/\\frac{([^}]+)}{([^}]+)}/g, '($1)/($2)') // Manejo de fracciones
                     .replace(/\\ /g, '')
                     .replace(/\s+/g, '');
                 
-                // Asegurar que ln sea reconocido como log para Math.js
-                // Se busca `ln(` para evitar reemplazar `ln` dentro de otras palabras.
-                normalized = normalized.replace(/\\ln\(/g, 'log(').replace(/ln\(/g, 'log('); 
+                // Add parentheses for common functions if missing around 'x' or a number.
+                // This is a last resort for functions like 'sinx' -> 'sin(x)'
+                const functionNames = ['sin', 'cos', 'tan', 'log', 'exp', 'sqrt', 'abs', 'sec', 'csc', 'cot'];
+                const functionWrapRegex = new RegExp(`(?<![a-zA-Z0-9])(${functionNames.join('|')})([a-zA-Z0-9]+)(?!\\()`, 'g');
+                normalized = normalized.replace(functionWrapRegex, '$1($2)');
 
                 return normalized;
             };
@@ -929,7 +970,7 @@
             const addStep = (description, formula, rule) => {
                 derivationSteps.push({
                     description: description,
-                    formula: formula,
+                    formula: formatLatex(formula), // Aplicar formatLatex aquí
                     rule: rule
                 });
             };
@@ -962,20 +1003,13 @@
 
             // Función para mejorar la visualización de LaTeX
             const formatLatex = (latexStr) => {
-                // Mejorar visualización de fracciones
-                latexStr = latexStr.replace(/\\frac\{([^}]+)\}\{([^}]+)\}/g, (match, num, den) => {
-                    if (den.match(/^[a-zA-Z0-9]$/)) {
-                        return `\\frac{${num}}{${den}}`;
-                    }
-                    return `\\frac{${num}}{\\left(${den}\\right)}`;
-                });
-                
-                // Mejorar visualización de exponentes
-                latexStr = latexStr.replace(/\^\{([^}]+)\}/g, (match, exp) => {
-                    if (exp.match(/^[a-zA-Z0-9]$/)) return `^${exp}`;
-                    return `^{${exp}}`;
-                });
-                
+                // Asegurarse de que latexStr sea una cadena antes de procesar
+                if (typeof latexStr !== 'string') {
+                    console.error("formatLatex recibió una entrada que no es una cadena:", latexStr);
+                    return String(latexStr); // Convertir a cadena para evitar errores, aunque la causa raíz debería corregirse antes
+                }
+                // Eliminar explícitamente \cdot si aparece
+                latexStr = latexStr.replace(/\\cdot/g, '');
                 return latexStr;
             };
 
@@ -984,11 +1018,13 @@
                 // Simplifica el nodo antes de intentar derivar para mejor reconocimiento
                 n = math.simplify(n);
 
+                const toTexOptions = { implicit: 'hide' }; // Opciones para ocultar la multiplicación implícita
+
                 if (n.type === 'ConstantNode') {
                     const result = new math.ConstantNode(0);
                     addStep(
                         "Derivada de una constante",
-                        `$$ \\frac{d}{dx}(${n.toTex()}) = ${result.toTex()} $$`,
+                        `$$ \\frac{d}{dx}(${n.toTex(toTexOptions)}) = ${result.toTex(toTexOptions)} $$`,
                         "d/dx [k] = 0"
                     );
                     return result;
@@ -996,11 +1032,21 @@
                     const result = new math.ConstantNode(1);
                     addStep(
                         "Derivada de la variable x",
-                        `$$ \\frac{d}{dx}(x) = ${result.toTex()} $$`,
+                        `$$ \\frac{d}{dx}(x) = ${result.toTex(toTexOptions)} $$`,
                         "d/dx [x] = 1"
                     );
                     return result;
-                } else if (n.type === 'OperatorNode') {
+                } else if (n.type === 'SymbolNode' && n.name !== 'x') { // NEW ADDITION
+                    // Treat other symbols (like 'a', 'b', 'cos', 'sin' if not followed by args) as constants
+                    const result = new math.ConstantNode(0);
+                    addStep(
+                        `Derivada de un símbolo tratado como constante (${n.name})`,
+                        `$$ \\frac{d}{dx}(${n.toTex(toTexOptions)}) = ${result.toTex(toTexOptions)} $$`,
+                        "d/dx [símbolo] = 0 (símbolo tratado como constante)"
+                    );
+                    return result;
+                }
+                else if (n.type === 'OperatorNode') {
                     if (n.op === '/') {
                         // REGLA DEL COCIENTE
                         const numerator = n.args[0];
@@ -1008,17 +1054,19 @@
 
                         // Caso especial: constante en el denominador, e.g., x^2 / 9 -> (1/9) * x^2
                         if (denominator.type === 'ConstantNode') {
-                            const constantFactor = new math.FractionNode(new math.ConstantNode(1), denominator);
+                            const one = new math.ConstantNode(1);
+                            const constantFactor = new math.OperatorNode('/', 'divide', [one, denominator]);
+                            
                             addStep(
                                 "Reescribir término con denominador constante",
-                                `$$ \\frac{${numerator.toTex()}}{${denominator.toTex()}} = ${constantFactor.toTex()} \\cdot ${numerator.toTex()} $$`,
-                                "k·f(x)"
+                                `$$ \\frac{${numerator.toTex(toTexOptions)}}{${denominator.toTex(toTexOptions)}} = \\frac{1}{${denominator.toTex(toTexOptions)}} \\cdot ${numerator.toTex(toTexOptions)} $$`,
+                                "Reescritura algebraica"
                             );
                             const derivedNumerator = deriveNode(numerator, depth + 1);
                             const result = math.simplify(new math.OperatorNode('*', 'multiply', [constantFactor, derivedNumerator]));
                             addStep(
                                 "Aplicar regla de la constante por una función",
-                                `$$ \\frac{d}{dx}\\left(${constantFactor.toTex()} \\cdot ${numerator.toTex()}\\right) = ${constantFactor.toTex()} \\cdot \\frac{d}{dx}\\left(${numerator.toTex()}\\right) = ${result.toTex()} $$`,
+                                `$$ \\frac{d}{dx}\\left(\\frac{1}{${denominator.toTex(toTexOptions)}} \\cdot ${numerator.toTex(toTexOptions)}\\right) = \\frac{1}{${denominator.toTex(toTexOptions)}} \\cdot \\frac{d}{dx}\\left(${numerator.toTex(toTexOptions)}\\right) = ${result.toTex(toTexOptions)} $$`,
                                 "d/dx [k·f(x)] = k·f'(x)"
                             );
                             return result;
@@ -1026,7 +1074,7 @@
                         
                         addStep(
                             "Identificada división de funciones - aplicando regla del cociente",
-                            `$$ \\frac{d}{dx}\\left(\\frac{u}{v}\\right) = \\frac{v \\cdot u' - u \\cdot v'}{v^2} $$ donde $u = ${numerator.toTex()}$, $v = ${denominator.toTex()}`,
+                            `$$ \\frac{d}{dx}\\left(\\frac{u}{v}\\right) = \\frac{v \\cdot u' - u \\cdot v'}{v^2} $$ donde $u = ${numerator.toTex(toTexOptions)}$, $v = ${denominator.toTex(toTexOptions)}`,
                             "Regla del cociente: d/dx[u/v] = (v·u' - u·v')/v²"
                         );
                         
@@ -1042,7 +1090,7 @@
                         
                         addStep(
                             "Sustitución y aplicación de la regla del cociente",
-                            `$$ \\frac{d}{dx}\\left(\\frac{${numerator.toTex()}}{${denominator.toTex()}}\\right) = \\frac{${denominator.toTex()} \\cdot ${numeratorDerived.toTex()} - ${numerator.toTex()} \\cdot ${denominatorDerived.toTex()}}{(${denominator.toTex()})^2} $$`,
+                            `$$ \\frac{d}{dx}\\left(\\frac{${numerator.toTex(toTexOptions)}}{${denominator.toTex(toTexOptions)}}\\right) = \\frac{${denominator.toTex(toTexOptions)} \\cdot ${numeratorDerived.toTex(toTexOptions)} - ${numerator.toTex(toTexOptions)} \\cdot ${denominatorDerived.toTex(toTexOptions)}}{(${denominator.toTex(toTexOptions)})^2} $$`,
                             "Sustitución en la regla del cociente"
                         );
                         
@@ -1065,31 +1113,31 @@
                             }
 
                             const baseDerived = deriveNode(base, depth + 1);
+                            // Validar que baseDerived es un nodo válido antes de usarlo
+                            if (!math.isNode(baseDerived)) {
+                                console.error("Error: baseDerived no es un nodo válido.", baseDerived);
+                                throw new Error("Error interno de derivación: baseDerived no es un nodo válido.");
+                            }
                             const result = math.simplify(new math.OperatorNode('*', 'multiply', [coeff, newPower, baseDerived]));
 
                             addStep(
                                 `Derivada de una función elevada a una constante (Regla de la Cadena)`,
-                                `$$ \\frac{d}{dx}(u^{${exponent.toTex()}}) = ${exponent.toTex()}u^{${newExp.toTex()}} \\cdot u' $$ donde $u = ${base.toTex()}$, $u' = ${baseDerived.toTex()}`,
+                                `$$ \\frac{d}{dx}(u^{${exponent.toTex(toTexOptions)}}) = ${exponent.toTex(toTexOptions)}u^{${newExp.toTex(toTexOptions)}} \\cdot u' $$ donde $u = ${base.toTex(toTexOptions)}$, $u' = ${baseDerived.toTex(toTexOptions)}`,
                                 "d/dx [u^n] = n·u^(n-1)·u'"
                             );
                             return result;
                         } else if (isSymbolX(base)) {
-                            // This case should be handled by the general u^n rule if base is x.
-                            // However, specifically for x^f(x) this is different (logarithmic differentiation)
-                            // For simplicity, this handles x^k where k is a variable (not constant)
-                            // For more complex cases like x^x, this needs logarithmic differentiation.
-                            // For now, only constant exponents are fully supported by specific rule.
-                            // If exponent is also x (e.g. x^x), it's more complex (logarithmic differentiation)
-                            // For now, if exponent is not constant, it's not directly supported by basic rules.
-                            
-                            // If base is x and exponent is function of x: d/dx(x^f(x)) = x^f(x) * (f'(x)ln(x) + f(x)/x)
-                            // This is advanced, so for this scope, throw error or simplify.
                             if (exponent.toString().includes('x')) {
                                 throw new Error("Derivada de x^f(x) no soportada directamente por reglas básicas.");
                             }
                         } else if (base.type === 'ConstantNode') { // a^u
                             const constantBase = base;
                             const exponentDerived = deriveNode(exponent, depth + 1);
+                             // Validar que exponentDerived es un nodo válido antes de usarlo
+                            if (!math.isNode(exponentDerived)) {
+                                console.error("Error: exponentDerived no es un nodo válido.", exponentDerived);
+                                throw new Error("Error interno de derivación: exponentDerived no es un nodo válido.");
+                            }
                             const result = math.simplify(new math.OperatorNode('*', 'multiply', [
                                 n, // The original a^u
                                 new math.FunctionNode('log', [constantBase]), // ln(a)
@@ -1097,7 +1145,7 @@
                             ]));
                             addStep(
                                 `Derivada de una constante elevada a una función (Regla de la Cadena)`,
-                                `$$ \\frac{d}{dx}(a^u) = a^u \\cdot \\ln(a) \\cdot u' $$ donde $a = ${constantBase.toTex()}$, $u = ${exponent.toTex()}$, $u' = ${exponentDerived.toTex()}`,
+                                `$$ \\frac{d}{dx}(a^u) = a^u \\cdot \\ln(a) \\cdot u' $$ donde $a = ${constantBase.toTex(toTexOptions)}$, $u = ${exponent.toTex(toTexOptions)}$, $u' = ${exponentDerived.toTex(toTexOptions)}`,
                                 "d/dx [a^u] = a^u·ln(a)·u'"
                             );
                             return result;
@@ -1106,34 +1154,20 @@
                         const left = n.args[0];
                         const right = n.args[1];
                         
-                        if (left.type === 'ConstantNode' || (left.type === 'OperatorNode' && (left.op === '+' || left.op === '-') && left.args.every(arg => arg.type === 'ConstantNode'))) { // Constant multiple rule
-                            const derivedRight = deriveNode(right, depth + 1);
-                            const result = new math.OperatorNode('*', 'multiply', [left, derivedRight]);
-                            addStep(
-                                "Aplicando regla de la constante por una función",
-                                `$$ \\frac{d}{dx}\\left(${left.toTex()} \\cdot ${right.toTex()}\\right) = ${left.toTex()} \\cdot \\frac{d}{dx}\\left(${right.toTex()}\\right) = ${result.toTex()} $$`,
-                                "d/dx [k·f(x)] = k·f'(x)"
-                            );
-                            return result;
-                        } else if (right.type === 'ConstantNode' || (right.type === 'OperatorNode' && (right.op === '+' || right.op === '-') && right.args.every(arg => arg.type === 'ConstantNode'))) { // Constant multiple rule (reversed)
-                            const derivedLeft = deriveNode(left, depth + 1);
-                            const result = new math.OperatorNode('*', 'multiply', [right, derivedLeft]);
-                            addStep(
-                                "Aplicando regla de la constante por una función",
-                                `$$ \\frac{d}{dx}\\left(${left.toTex()} \\cdot ${right.toTex()}\\right) = ${right.toTex()} \\cdot \\frac{d}{dx}\\left(${left.toTex()}\\right) = ${result.toTex()} $$`,
-                                "d/dx [f(x)·k] = k·f'(x)"
-                            );
-                            return result;
+                        const leftDerived = deriveNode(left, depth + 1);
+                        const rightDerived = deriveNode(right, depth + 1);
+
+                        // Validar que los términos derivados son nodos válidos
+                        if (!math.isNode(leftDerived) || !math.isNode(rightDerived)) {
+                            console.error("Error: leftDerived o rightDerived no son nodos válidos.", leftDerived, rightDerived);
+                            throw new Error("Error interno de derivación: los términos de la regla del producto no son nodos válidos.");
                         }
                         
                         addStep(
                             "Aplicando regla del producto",
-                            `$$ \\frac{d}{dx}[u \\cdot v] = u' \\cdot v + u \\cdot v' $$ donde $u = ${left.toTex()}$, $v = ${right.toTex()}`,
+                            `$$ \\frac{d}{dx}[u \\cdot v] = u' \\cdot v + u \\cdot v' $$ donde $u = ${left.toTex(toTexOptions)}$, $v = ${right.toTex(toTexOptions)}`,
                             "d/dx [u·v] = u'·v + u·v'"
                         );
-                        
-                        const leftDerived = deriveNode(left, depth + 1);
-                        const rightDerived = deriveNode(right, depth + 1);
                         
                         const term1 = new math.OperatorNode('*', 'multiply', [leftDerived, right]);
                         const term2 = new math.OperatorNode('*', 'multiply', [left, rightDerived]);
@@ -1147,7 +1181,15 @@
                             `d/dx [u ${n.op} v] = u' ${n.op} v'`
                         );
                         
-                        const derivedArgs = n.args.map(arg => deriveNode(arg, depth + 1));
+                        const derivedArgs = n.args.map(arg => {
+                            const derivedArg = deriveNode(arg, depth + 1);
+                            // Validar que cada argumento derivado es un nodo válido
+                            if (!math.isNode(derivedArg)) {
+                                console.error("Error: argumento derivado no es un nodo válido.", derivedArg);
+                                throw new Error("Error interno de derivación: un argumento derivado no es un nodo válido.");
+                            }
+                            return derivedArg;
+                        });
                         
                         // Reconstruye la expresión con los operadores originales
                         let result = derivedArgs[0];
@@ -1162,18 +1204,28 @@
                             "d/dx [-f(x)] = -f'(x)"
                         );
                         const derivedArg = deriveNode(n.args[0], depth + 1);
+                        // Validar que derivedArg es un nodo válido
+                        if (!math.isNode(derivedArg)) {
+                            console.error("Error: derivedArg no es un nodo válido.", derivedArg);
+                            throw new Error("Error interno de derivación: derivedArg no es un nodo válido.");
+                        }
                         return new math.OperatorNode('-', 'unaryMinus', [derivedArg]);
                     }
                 } else if (n.type === 'FunctionNode') {
                     const arg = n.args[0]; // El argumento de la función (e.g., 'x' en sin(x))
                     const innerDerivative = deriveNode(arg, depth + 1); // La derivada del argumento (u')
+                    // Validar que innerDerivative es un nodo válido
+                    if (!math.isNode(innerDerivative)) {
+                        console.error("Error: innerDerivative no es un nodo válido.", innerDerivative);
+                        throw new Error("Error interno de derivación: innerDerivative no es un nodo válido.");
+                    }
                     
                     switch (n.fn.name) {
                         case 'sin':
                             const cosU = new math.FunctionNode('cos', [arg]);
                             addStep(
                                 "Derivada de función seno (Regla de la Cadena)",
-                                `$$ \\frac{d}{dx}(\\sin(u)) = \\cos(u) \\cdot u' $$ donde $u = ${arg.toTex()}$, $u' = ${innerDerivative.toTex()}`,
+                                `$$ \\frac{d}{dx}(\\sin(u)) = \\cos(u) \\cdot u' $$ donde $u = ${arg.toTex(toTexOptions)}$, $u' = ${innerDerivative.toTex(toTexOptions)}`,
                                 "d/dx [sin(u)] = cos(u)·u'"
                             );
                             return math.simplify(new math.OperatorNode('*', 'multiply', [cosU, innerDerivative]));
@@ -1182,7 +1234,7 @@
                             const negSinU = new math.OperatorNode('-', 'unaryMinus', [new math.FunctionNode('sin', [arg])]);
                             addStep(
                                 "Derivada de función coseno (Regla de la Cadena)",
-                                `$$ \\frac{d}{dx}(\\cos(u)) = -\\sin(u) \\cdot u' $$ donde $u = ${arg.toTex()}$, $u' = ${innerDerivative.toTex()}`,
+                                `$$ \\frac{d}{dx}(\\cos(u)) = -\\sin(u) \\cdot u' $$ donde $u = ${arg.toTex(toTexOptions)}$, $u' = ${innerDerivative.toTex(toTexOptions)}`,
                                 "d/dx [cos(u)] = -sin(u)·u'"
                             );
                             return math.simplify(new math.OperatorNode('*', 'multiply', [negSinU, innerDerivative]));
@@ -1191,7 +1243,7 @@
                             const secSquaredU = new math.OperatorNode('^', 'pow', [new math.FunctionNode('sec', [arg]), new math.ConstantNode(2)]);
                             addStep(
                                 "Derivada de función tangente (Regla de la Cadena)",
-                                `$$ \\frac{d}{dx}(\\tan(u)) = \\sec^2(u) \\cdot u' $$ donde $u = ${arg.toTex()}$, $u' = ${innerDerivative.toTex()}`,
+                                `$$ \\frac{d}{dx}(\\tan(u)) = \\sec^2(u) \\cdot u' $$ donde $u = ${arg.toTex(toTexOptions)}$, $u' = ${innerDerivative.toTex(toTexOptions)}`,
                                 "d/dx [tan(u)] = sec²(u)·u'"
                             );
                             return math.simplify(new math.OperatorNode('*', 'multiply', [secSquaredU, innerDerivative]));
@@ -1200,7 +1252,7 @@
                             if (n.args.length === 1) { // ln(u)
                                 addStep(
                                     "Derivada de logaritmo natural (Regla de la Cadena)",
-                                    `$$ \\frac{d}{dx}(\\ln(u)) = \\frac{u'}{u} $$ donde $u = ${arg.toTex()}$, $u' = ${innerDerivative.toTex()}`,
+                                    `$$ \\frac{d}{dx}(\\ln(u)) = \\frac{u'}{u} $$ donde $u = ${arg.toTex(toTexOptions)}$, $u' = ${innerDerivative.toTex(toTexOptions)}`,
                                     "d/dx [ln(u)] = u'/u"
                                 );
                                 return math.simplify(new math.OperatorNode('/', 'divide', [innerDerivative, arg]));
@@ -1210,8 +1262,8 @@
                                 const denominator = new math.OperatorNode('*', 'multiply', [arg, new math.FunctionNode('log', [base])]);
                                 const result = new math.OperatorNode('/', 'divide', [innerDerivative, denominator]);
                                 addStep(
-                                    `Derivada de logaritmo base ${base.toTex()} (Regla de la Cadena)`,
-                                    `$$ \\frac{d}{dx}(\\log_{${base.toTex()}}(u)) = \\frac{u'}{u \\cdot \\ln(${base.toTex()})} $$ donde $u = ${arg.toTex()}$, $u' = ${innerDerivative.toTex()}`,
+                                    `Derivada de logaritmo base ${base.toTex(toTexOptions)} (Regla de la Cadena)`,
+                                    `$$ \\frac{d}{dx}(\\log_{${base.toTex(toTexOptions)}}(u)) = \\frac{u'}{u \\cdot \\ln(${base.toTex(toTexOptions)})} $$ donde $u = ${arg.toTex(toTexOptions)}$, $u' = ${innerDerivative.toTex(toTexOptions)}`,
                                     "d/dx [log_b(u)] = u'/(u·ln(b))"
                                 );
                                 return math.simplify(result);
@@ -1221,7 +1273,7 @@
                         case 'exp': // e^u
                             addStep(
                                 "Derivada de función exponencial (Regla de la Cadena)",
-                                `$$ \\frac{d}{dx}(e^u) = e^u \\cdot u' $$ donde $u = ${arg.toTex()}$, $u' = ${innerDerivative.toTex()}`,
+                                `$$ \\frac{d}{dx}(e^u) = e^u \\cdot u' $$ donde $u = ${arg.toTex(toTexOptions)}$, $u' = ${innerDerivative.toTex(toTexOptions)}`,
                                 "d/dx [e^u] = e^u·u'"
                             );
                             return math.simplify(new math.OperatorNode('*', 'multiply', [n, innerDerivative])); // n es e^u
@@ -1229,15 +1281,18 @@
                         case 'sqrt': // sqrt(u) = u^(1/2)
                             // d/dx(sqrt(u)) = 1/(2*sqrt(u)) * u'
                             const sqrtResult = new math.OperatorNode('*', 'multiply', [
-                                new math.FractionNode(new math.ConstantNode(1), new math.OperatorNode('*', 'multiply', [
-                                    new math.ConstantNode(2),
-                                    new math.FunctionNode('sqrt', [arg])
-                                ])),
+                                new math.OperatorNode('/', 'divide', [
+                                    new math.ConstantNode(1), 
+                                    new math.OperatorNode('*', 'multiply', [
+                                        new math.ConstantNode(2),
+                                        new math.FunctionNode('sqrt', [arg])
+                                    ])
+                                ]),
                                 innerDerivative
                             ]);
                             addStep(
                                 "Derivada de la raíz cuadrada (Regla de la Cadena)",
-                                `$$ \\frac{d}{dx}(\\sqrt{u}) = \\frac{1}{2\\sqrt{u}} \\cdot u' $$ donde $u = ${arg.toTex()}$, $u' = ${innerDerivative.toTex()}`,
+                                `$$ \\frac{d}{dx}(\\sqrt{u}) = \\frac{1}{2\\sqrt{u}} \\cdot u' $$ donde $u = ${arg.toTex(toTexOptions)}$, $u' = ${innerDerivative.toTex(toTexOptions)}`,
                                 "d/dx [sqrt(u)] = (1/(2·sqrt(u)))·u'"
                             );
                             return math.simplify(sqrtResult);
@@ -1250,7 +1305,7 @@
                             ]);
                              addStep(
                                 "Derivada del valor absoluto (Regla de la Cadena)",
-                                `$$ \\frac{d}{dx}(|u|) = \\frac{u}{|u|} \\cdot u' $$ donde $u = ${arg.toTex()}$, $u' = ${innerDerivative.toTex()}`,
+                                `$$ \\frac{d}{dx}(|u|) = \\frac{u}{|u|} \\cdot u' $$ donde $u = ${arg.toTex(toTexOptions)}$, $u' = ${innerDerivative.toTex(toTexOptions)}`,
                                 "d/dx [|u|] = (u/|u|)·u' (para u ≠ 0)"
                             );
                             return math.simplify(absResult);
@@ -1265,7 +1320,7 @@
                 
                 // Si llegamos aquí, el tipo de nodo no está soportado por nuestras reglas de derivación
                 console.warn("No se pudo derivar el término:", n.toString(), "Tipo de nodo:", n.type);
-                throw new Error(`No se puede derivar el término: ${n.toTex()}. Tipo de elemento no reconocido o regla de derivación no implementada.`);
+                throw new Error(`No se puede derivar el término: ${n.toTex(toTexOptions)}. Tipo de elemento no reconocido o regla de derivación no implementada.`);
             };
 
             // Función principal para calcular derivada
@@ -1287,7 +1342,7 @@
                     
                     addStep(
                         "Función original a derivar",
-                        `$$ f(x) = ${node.toTex()} $$`,
+                        `$$ f(x) = ${node.toTex({ implicit: 'hide' })} $$`,
                         "Identificación de la función"
                     );
 
@@ -1299,7 +1354,7 @@
                         if (derivedNode.toString() !== simplifiedNode.toString()) {
                             addStep(
                                 "Simplificación del resultado",
-                                `$$ ${derivedNode.toTex()} = ${simplifiedNode.toTex()} $$`,
+                                `$$ ${derivedNode.toTex({ implicit: 'hide' })} = ${simplifiedNode.toTex({ implicit: 'hide' })} $$`,
                                 "Simplificación algebraica"
                             );
                         }
@@ -1308,12 +1363,12 @@
                         
                         const originalLatex = formatLatex(node.toTex({
                             parenthesis: 'auto',
-                            implicit: 'show'
+                            implicit: 'hide' // Asegura que no se muestre el punto de multiplicación
                         }));
                         
                         const derivativeLatex = formatLatex(simplifiedNode.toTex({
                             parenthesis: 'auto',
-                            implicit: 'show'
+                            implicit: 'hide' // Asegura que no se muestre el punto de multiplicación
                         }));
 
                         resultMathField.innerHTML = `
