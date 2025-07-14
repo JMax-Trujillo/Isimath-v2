@@ -829,6 +829,10 @@ body.dark {
             }
         }
 
+        .testimony__video {
+            width: 400px;
+        }
+
         @media (min-width: 769px) and (max-width: 1024px) {
             .footer__content {
                 grid-template-columns: repeat(2, 1fr);
