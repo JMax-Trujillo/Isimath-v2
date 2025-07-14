@@ -66,50 +66,81 @@
 
 <!-- TODO: Tools -->
 
-    <div class="tools" id="tools">
-        <h2 class="tools__title">Herramientas</h2>
-        <p class="tools__description">ALGOASdjkansdkjansdkjansdkjansd</p>
-        <div class="tools__cards">
-            <div class="tool__card card-limites">
-                <h3 class="tool_card-title">Limites</h3>
-                <p class="tool__card-description">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Distinctio</p>
+     <div class="container">
+        <section class="tools-section">
+            <div class="horizontal-scroll" id="toolsScroller">
+                <div class="tool-card">
+                    <div class="tool-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <div class="tool-content">
+                        <h3>Límites</h3>
+                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Explicitior dolore dolores ut ipsum dolorim turisiunt.</p>
+                    </div>
+                </div>
+                
+                <div class="tool-card">
+                    <div class="tool-icon">
+                        <i class="fas fa-function"></i>
+                    </div>
+                    <div class="tool-content">
+                        <h3>Derivadas</h3>
+                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Explicitior dolore dolores ut ipsum dolorim turisiunt.</p>
+                    </div>
+                </div>
+                
+                <div class="tool-card">
+                    <div class="tool-icon">
+                        <i class="fas fa-calculator"></i>
+                    </div>
+                    <div class="tool-content">
+                        <h3>Integrales Indefinidas</h3>
+                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Explicitior dolore dolores ut ipsum dolorim turisiunt.</p>
+                    </div>
+                </div>
+                
+                <div class="tool-card">
+                    <div class="tool-icon">
+                        <i class="fas fa-square-root-alt"></i>
+                    </div>
+                    <div class="tool-content">
+                        <h3>Calculadora</h3>
+                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Explicitior dolore dolores ut ipsum dolorim turisiunt.</p>
+                    </div>
+                </div>
+                
+                <div class="tool-card">
+                    <div class="tool-icon">
+                        <i class="fas fa-border-all"></i>
+                    </div>
+                    <div class="tool-content">
+                        <h3>Determinantes</h3>
+                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Explicitior dolore dolores ut ipsum dolorim turisiunt.</p>
+                    </div>
+                </div>
+                
+                <div class="tool-card">
+                    <div class="tool-icon">
+                        <i class="fas fa-exchange-alt"></i>
+                    </div>
+                    <div class="tool-content">
+                        <h3>Inversas</h3>
+                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Explicitior dolore dolores ut ipsum dolorim turisiunt.</p>
+                    </div>
+                </div>
+                
+                <div class="tool-card">
+                    <div class="tool-icon">
+                        <i class="fas fa-redo"></i>
+                    </div>
+                    <div class="tool-content">
+                        <h3>Iterativos</h3>
+                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Explicitior dolore dolores ut ipsum dolorim turisiunt.</p>
+                    </div>
+                </div>
             </div>
 
-            <div class="tool__card card-derivadas">
-                <h3 class="tool_card-title">Derivadas</h3>
-                <p class="tool__card-description">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Distinctio</p>
-            </div>
-
-            <div class="tool__card card-integralesI">
-                <h3 class="tool_card-title">Integrales Indefinidas</h3>
-                <p class="tool__card-description">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Distinctio</p>
-            </div>
-
-            <div class="tool__card card-integralesD">
-                <h3 class="tool_card-title">Integrales Definidas</h3>
-                <p class="tool__card-description">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Distinctio</p>
-            </div>
-
-            <div class="tool__card card-calculadora">
-                <h3 class="tool_card-title">Calculadora</h3>
-                <p class="tool__card-description">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Distinctio</p>
-            </div>
-
-            <div class="tool__card card-determinantes">
-                <h3 class="tool_card-title">Determinantes</h3>
-                <p class="tool__card-description">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Distinctio</p>
-            </div>
-
-            <div class="tool__card card-Inversas">
-                <h3 class="tool_card-title">Inversas</h3>
-                <p class="tool__card-description">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Distinctio</p>
-            </div>
-
-            <div class="tool__card card-iterativos">
-                <h3 class="tool_card-title">Iterativos</h3>
-                <p class="tool__card-description">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Distinctio</p>
-            </div>
-        </div>
+        </section>
     </div>
 
 <!-- TODO: Explicacion -->
@@ -378,6 +409,63 @@
         </div>
     </footer>
     <script src="styles/landing/landing.js"></script>
+    <script>
+         // Navegación del scroll horizontal
+        const scroller = document.getElementById('toolsScroller');
+        const scrollLeftBtn = document.getElementById('scrollLeft');
+        const scrollRightBtn = document.getElementById('scrollRight');
 
+        function updateScrollButtons() {
+            scrollLeftBtn.disabled = scroller.scrollLeft === 0;
+            scrollRightBtn.disabled = scroller.scrollLeft + scroller.clientWidth >= scroller.scrollWidth - 10;
+        }
+
+        scroller.addEventListener('scroll', updateScrollButtons);
+        window.addEventListener('resize', updateScrollButtons);
+        updateScrollButtons();
+        
+        scrollLeftBtn.addEventListener('click', () => {
+            scroller.scrollBy({ left: -320, behavior: 'smooth' });
+        });
+
+        scrollRightBtn.addEventListener('click', () => {
+            scroller.scrollBy({ left: 320, behavior: 'smooth' });
+        });
+
+        // Creación de partículas
+        function createParticles() {
+            const container = document.getElementById('particles');
+            container.innerHTML = '';
+            
+            const particleCount = 30;
+            const isDarkMode = body.getAttribute('data-theme') === 'dark';
+            const particleColor = isDarkMode ? 'rgba(100, 255, 218, 0.5)' : 'rgba(43, 108, 176, 0.4)';
+            
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                
+                // Tamaño aleatorio entre 2px y 6px
+                const size = Math.random() * 4 + 2;
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                particle.style.background = particleColor;
+                
+                // Posición aleatoria
+                particle.style.left = `${Math.random() * 100}%`;
+                particle.style.top = `${Math.random() * 100}%`;
+                
+                // Duración y delay de animación aleatorios
+                const duration = Math.random() * 20 + 10;
+                const delay = Math.random() * 5;
+                particle.style.animation = `float ${duration}s linear ${delay}s infinite`;
+                
+                container.appendChild(particle);
+            }
+        }
+
+        // Inicializar partículas
+        createParticles();
+    </script>
 </body>
 </html> 
